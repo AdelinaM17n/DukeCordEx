@@ -1,5 +1,12 @@
 package io.github.maheevil.dukecordex.commandhandler;
 
+import io.github.maheevil.dukecordex.DukeCordEx;
+import io.github.maheevil.dukecordex.commandhandler.annotations.ArgField;
+import io.github.maheevil.dukecordex.commandhandler.annotations.ArgParseType;
+import io.github.maheevil.dukecordex.commandhandler.annotations.NoArgs;
+import org.javacord.api.DiscordApi;
+import org.javacord.api.event.message.MessageCreateEvent;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -7,6 +14,50 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class CommandHandler {
+    public static void onMessageCreate(MessageCreateEvent event){
+        if(!event.isServerMessage() && !event.getMessageAuthor().isUser() && !event.getMessageContent().startsWith("!"))
+            return;
+
+        String[] messageContents = event.getMessageContent().substring(1).split("\\s");
+        String command = messageContents[0];
+        var commandArgContents = new ArrayList<>(Arrays.asList(Arrays.copyOfRange(messageContents, 1, messageContents.length)));
+
+        if(!DukeCordEx.CommandMap.containsKey(command)) return;
+
+        ChatCommandContainer commandObject = DukeCordEx.CommandMap.get(command);
+        var args = parseArgument(commandArgContents,commandObject, event.getApi());
+
+        if (args == null && commandObject.hasNonOptionalArgs()) {
+            event.getMessage().reply("Please enter arguement values needed for the command");
+            return;
+        }
+
+
+        try{
+            if(commandObject.argsClass() == NoArgs.class || (!commandObject.hasNonOptionalArgs() && args == null)){
+                commandObject.executionMethod().invoke(commandObject.extensionInstance(),event.getMessage(),event.getServer());
+                return;
+            }
+            var innerClass = commandObject.argsClass();
+            var constructor = innerClass.getConstructor(commandObject.extensionInstance().getClass()); //innerClass.getDeclaredConstructor(commandObject.getArgsFieldTypeList());
+            var argsInstance = constructor.newInstance(commandObject.extensionInstance());
+
+            var orderedList = commandObject.orderedFieldList();
+            assert args != null;
+
+            for(int i=0; i < orderedList.length; i++){
+                if(args[i] != null && !orderedList[i].getType().isAssignableFrom(args[i].getClass())){
+                    System.err.println("Arg type does not match");
+                    return;
+                }
+                orderedList[i].set(argsInstance,args[i]);
+            }
+
+            commandObject.executionMethod().invoke(commandObject.extensionInstance(),argsInstance,event.getMessage(),event.getServer());
+        }catch(NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e){
+            e.printStackTrace();
+        }
+    }
     /*@Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event){
         if(event.getAuthor().isBot() || !event.getMessage().getContentRaw().startsWith(UntitledBot.prefix))
@@ -57,9 +108,8 @@ public class CommandHandler {
             e.printStackTrace();
         }
 
-    }
-
-    public Object[] parseArgument(ArrayList<String> contents, ChatCommandContainer containerObject, JDA apiWrapper){
+    }*/
+    public static Object[] parseArgument(ArrayList<String> contents, ChatCommandContainer containerObject, DiscordApi apiWrapper){
         if(contents.size() < containerObject.nonOptionalArgCount()) return null;
 
         Field[] orderedList = containerObject.orderedFieldList();
@@ -76,7 +126,8 @@ public class CommandHandler {
                 orderedList[i] = null;
                 hasMetCoalesc = true;
             }else {
-                var orderedListType = orderedList[i].getType();
+                var ee = "ee";
+                /*var orderedListType = orderedList[i].getType();
                 if(orderedListType == String.class){
                     listObjects[i] = contents.get(0);
                     orderedList[i] = null;
@@ -91,10 +142,10 @@ public class CommandHandler {
                     listObjects[i] = null;
                 }
                 contents.remove(0);
-                orderedList[i] = null;
+                orderedList[i] = null;*/
             }
         }
 
         return Arrays.stream(orderedList).anyMatch(field -> field != null && !field.getAnnotation(ArgField.class).optional()) ? null : listObjects;
-    }*/
+    }
 }

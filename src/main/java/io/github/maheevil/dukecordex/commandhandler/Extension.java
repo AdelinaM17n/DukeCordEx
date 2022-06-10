@@ -1,5 +1,6 @@
 package io.github.maheevil.dukecordex.commandhandler;
 
+import io.github.maheevil.dukecordex.DukeCordEx;
 import io.github.maheevil.dukecordex.commandhandler.annotations.ArgField;
 import io.github.maheevil.dukecordex.commandhandler.annotations.ChatCommand;
 import io.github.maheevil.dukecordex.commandhandler.annotations.NoArgs;
@@ -16,10 +17,10 @@ public class Extension {
         methods.forEach(method -> {
             var annotation = method.getAnnotation(ChatCommand.class);
 
-            /*if(UntitledBot.CommandMap.containsKey(annotation.name())) {
+            if(DukeCordEx.CommandMap.containsKey(annotation.name())) {
                 System.err.println("Two commands cannot have the same name");
                 return;
-            }*/
+            }
 
             var orderedFieldList = findOrderedFieldList(annotation.argsClass());
 
@@ -32,7 +33,7 @@ public class Extension {
                     annotation.requiredPerms(),
                     this
             );
-            //UntitledBot.CommandMap.put(annotation.name(), container);
+            DukeCordEx.CommandMap.put(annotation.name(), container);
         });
     }
 

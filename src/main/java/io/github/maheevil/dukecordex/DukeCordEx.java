@@ -17,6 +17,6 @@ public class DukeCordEx {
     }
 
     public void init(DiscordApi discordApi){
-        discordApi.addMessageCreateListener(event -> CommandHandler.onMessageReceived(event))
+        discordApi.addMessageCreateListener(CommandHandler::onMessageCreate);
     }
 }

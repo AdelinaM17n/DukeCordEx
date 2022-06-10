@@ -15,10 +15,11 @@ import java.util.Objects;
 
 public class CommandHandler {
     public static void onMessageCreate(MessageCreateEvent event){
-        if(!event.isServerMessage() && !event.getMessageAuthor().isUser() && !event.getMessageContent().startsWith("!"))
+        if(!event.isServerMessage() || !event.getMessageAuthor().isUser() || !event.getMessageContent().startsWith("!"))
             return;
 
-        String[] messageContents = event.getMessageContent().substring(1).split("\\s");
+        var message = event.getMessage();
+        String[] messageContents = message.getContent().substring(1).split("\\s");
         String command = messageContents[0];
         var commandArgContents = new ArrayList<>(Arrays.asList(Arrays.copyOfRange(messageContents, 1, messageContents.length)));
 
@@ -28,23 +29,33 @@ public class CommandHandler {
         var args = parseArgument(commandArgContents,commandObject, event.getApi());
 
         if (args == null && commandObject.hasNonOptionalArgs()) {
-            event.getMessage().reply("Please enter arguement values needed for the command");
+            message.reply("Please enter arguement values needed for the command");
             return;
         }
 
+        var guild = event.getServer().orElseThrow();
+        var member = guild.getMemberById(event.getMessageAuthor().getId()).orElse(null);
+
+        if(member == null){
+            message.reply("Something went wrong");
+        }
+
+        if(!guild.hasPermissions(member,commandObject.requiredPerms())){
+            message.reply("You are missing permissions needed for the command");
+            return;
+        }
 
         try{
             if(commandObject.argsClass() == NoArgs.class || (!commandObject.hasNonOptionalArgs() && args == null)){
-                commandObject.executionMethod().invoke(commandObject.extensionInstance(),event.getMessage(),event.getServer());
+                commandObject.executionMethod().invoke(commandObject.extensionInstance(),message,guild);
                 return;
             }
             var innerClass = commandObject.argsClass();
-            var constructor = innerClass.getConstructor(commandObject.extensionInstance().getClass()); //innerClass.getDeclaredConstructor(commandObject.getArgsFieldTypeList());
+            var constructor = innerClass.getConstructor(commandObject.extensionInstance().getClass());
             var argsInstance = constructor.newInstance(commandObject.extensionInstance());
-
             var orderedList = commandObject.orderedFieldList();
-            assert args != null;
 
+            assert args != null;
             for(int i=0; i < orderedList.length; i++){
                 if(args[i] != null && !orderedList[i].getType().isAssignableFrom(args[i].getClass())){
                     System.err.println("Arg type does not match");
@@ -53,7 +64,7 @@ public class CommandHandler {
                 orderedList[i].set(argsInstance,args[i]);
             }
 
-            commandObject.executionMethod().invoke(commandObject.extensionInstance(),argsInstance,event.getMessage(),event.getServer());
+            commandObject.executionMethod().invoke(commandObject.extensionInstance(),argsInstance,message,guild);
         }catch(NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e){
             e.printStackTrace();
         }

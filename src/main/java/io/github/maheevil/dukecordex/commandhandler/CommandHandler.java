@@ -15,13 +15,19 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class CommandHandler {
-    public static HashMap<Class<?>, convertorInterface> converterMap = new HashMap<>(Map.ofEntries(
+    public static HashMap<Class<?>, ConvertorInterface> converterMap = new HashMap<>(Map.ofEntries(
             Map.entry(String.class, (string , discordApi) -> string),
             Map.entry(User.class, (string , discordApi) -> {
                 if(string.startsWith("<@")){
-                    return discordApi.getUserById(string.substring(2, 20)).join();
+                    return discordApi.getUserById(string.substring(2, 20)).exceptionally(x -> {
+                        //x.printStackTrace();
+                        return null;
+                    }).join();
                 }else{
-                    return discordApi.getUserById(string).join();
+                    return discordApi.getUserById(string).exceptionally(x -> {
+                        //x.printStackTrace();
+                        return null;
+                    }).join();
                 }
             }),
             Map.entry(ServerTextChannel.class,(string, discordApi) -> {
@@ -40,7 +46,7 @@ public class CommandHandler {
             }))
     ));
 
-    public interface convertorInterface {
+    public interface ConvertorInterface {
         Object get(String string,DiscordApi discordApi);
     }
 
@@ -59,12 +65,12 @@ public class CommandHandler {
         var args = parseArgument(commandArgContents,commandObject, event.getApi());
 
         if (args == null && commandObject.hasNonOptionalArgs()) {
-            message.reply("Please enter arguement values needed for the command");
+            message.reply("Please enter argument values needed for the command");
             return;
         }
 
         var guild = event.getServer().orElseThrow();
-        var member = message.getUserAuthor().orElse(null);
+        var member = message.getUserAuthor().orElse(null); // TODO - Remove this, there is no member object in javacord
 
         if(member == null){
             message.reply("Something went wrong");
@@ -110,6 +116,7 @@ public class CommandHandler {
 
         for(int i =0; i <= orderedList.length-1; i++){
             if(orderedList[i] == null) return null;
+
             if(hasMetCoalesc){
                 listObjects[i] = null;
             }else if(orderedList[i].getAnnotation(ArgField.class).type() == ArgParseType.STRING_COALESCING){
@@ -118,13 +125,15 @@ public class CommandHandler {
                 hasMetCoalesc = true;
             }else {
                 var currentFieldType = orderedList[i].getType();
-                listObjects[i] = converterMap.containsKey(currentFieldType) ?
-                        converterMap.get(currentFieldType).get(contents.get(0),apiWrapper) : null;
-                orderedList[i] = null;
+                listObjects[i] = converterMap.containsKey(currentFieldType)
+                        ? converterMap.get(currentFieldType).get(contents.get(0),apiWrapper) : null;
+                if(listObjects[i] != null) orderedList[i] = null;
                 contents.remove(0);
             }
         }
 
-        return Arrays.stream(orderedList).anyMatch(field -> field != null && !field.getAnnotation(ArgField.class).optional()) ? null : listObjects;
+        return Arrays.stream(orderedList)
+                .anyMatch(field -> field != null && !field.getAnnotation(ArgField.class).optional())
+                ? null : listObjects;
     }
 }

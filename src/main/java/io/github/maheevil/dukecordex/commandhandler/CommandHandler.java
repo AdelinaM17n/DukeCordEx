@@ -19,15 +19,9 @@ public class CommandHandler {
             Map.entry(String.class, (string , discordApi) -> string),
             Map.entry(User.class, (string , discordApi) -> {
                 if(string.startsWith("<@")){
-                    return discordApi.getUserById(string.substring(2, 20)).exceptionally(x -> {
-                        //x.printStackTrace();
-                        return null;
-                    }).join();
+                    return discordApi.getUserById(string.substring(2, 20)).exceptionally(x -> null).join();
                 }else{
-                    return discordApi.getUserById(string).exceptionally(x -> {
-                        //x.printStackTrace();
-                        return null;
-                    }).join();
+                    return discordApi.getUserById(string).exceptionally(x -> null).join();
                 }
             }),
             Map.entry(ServerTextChannel.class,(string, discordApi) -> {
@@ -70,14 +64,14 @@ public class CommandHandler {
         }
 
         var guild = event.getServer().orElseThrow();
-        var member = message.getUserAuthor().orElse(null); // TODO - Remove this, there is no member object in javacord
+        var commandUser = message.getUserAuthor().orElse(null);
 
-        if(member == null){
+        if(commandUser == null){
             message.reply("Something went wrong");
             return;
         }
 
-        if(!guild.hasPermissions(member,commandObject.requiredPerms())){
+        if(!guild.hasPermissions(commandUser,commandObject.requiredPerms())){
             message.reply("You are missing permissions needed for the command");
             return;
         }

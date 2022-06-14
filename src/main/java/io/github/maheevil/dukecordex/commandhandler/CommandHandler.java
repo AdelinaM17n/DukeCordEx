@@ -14,7 +14,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
-public class CommandHandler {
+public class CommandHandler<T> {
     public static HashMap<Class<?>, ConvertorInterface> converterMap = new HashMap<>(Map.ofEntries(
             Map.entry(String.class, (string , discordApi) -> string),
             Map.entry(User.class, (string , discordApi) -> {
@@ -44,7 +44,7 @@ public class CommandHandler {
         Object get(String string,DiscordApi discordApi);
     }
 
-    public static void onMessageCreate(MessageCreateEvent event){
+    public static <T>void onMessageCreate(MessageCreateEvent event){
         if(!event.isServerMessage() || !event.getMessageAuthor().isUser() || !event.getMessageContent().startsWith("!"))
             return;
 
@@ -55,10 +55,10 @@ public class CommandHandler {
 
         if(!DukeCordEx.CommandMap.containsKey(command)) return;
 
-        ChatCommandContainer commandObject = DukeCordEx.CommandMap.get(command);
+        ChatCommandContainer<?> commandObject = DukeCordEx.CommandMap.get(command);
         var args = parseArgument(commandArgContents,commandObject, event.getApi());
 
-        if (args == null && commandObject.hasNonOptionalArgs()) {
+        if (args == null && commandObject.hasNonOptionalArgs) {
             message.reply("Please enter argument values needed for the command");
             return;
         }
@@ -71,40 +71,45 @@ public class CommandHandler {
             return;
         }
 
-        if(!guild.hasPermissions(commandUser,commandObject.requiredPerms())){
+        if(!guild.hasPermissions(commandUser,commandObject.getRequiredPerms())){
             message.reply("You are missing permissions needed for the command");
             return;
         }
 
         try{
-            if(commandObject.argsClass() == NoArgs.class || (!commandObject.hasNonOptionalArgs() && args == null)){
-                commandObject.executionMethod().invoke(commandObject.extensionInstance(),message,guild);
+            if(commandObject.argClass == NoArgs.class){
+                //commandObject.executionMethod().invoke(commandObject.extensionInstance,message,guild);
+                commandObject.runConsumer(null,event);
                 return;
             }
-            var innerClass = commandObject.argsClass();
-            var constructor = innerClass.getConstructor(commandObject.extensionInstance().getClass());
-            var argsInstance = constructor.newInstance(commandObject.extensionInstance());
-            var orderedList = commandObject.orderedFieldList();
+            var innerClass = commandObject.argClass;
+            var constructor = innerClass.getConstructor(commandObject.extensionInstance.getClass());
+            var argsInstance = constructor.newInstance(commandObject.extensionInstance);
+            var orderedList = commandObject.getOrderedFieldList();
 
-            assert args != null;
-            for(int i=0; i < orderedList.length; i++){
-                if(args[i] != null && !orderedList[i].getType().isAssignableFrom(args[i].getClass())){
-                    System.err.println("Arg type does not match");
-                    return;
+            if(!commandObject.hasNonOptionalArgs && args == null){
+                for (Field field : orderedList) {
+                    field.set(argsInstance, null);
                 }
-                orderedList[i].set(argsInstance,args[i]);
+            }else {
+                for(int i=0; i < orderedList.length; i++){
+                    if(args[i] != null && !orderedList[i].getType().isAssignableFrom(args[i].getClass())){
+                        System.err.println("Arg type does not match");
+                        return;
+                    }
+                    orderedList[i].set(argsInstance,args[i]);
+                }
             }
-
-            commandObject.executionMethod().invoke(commandObject.extensionInstance(),argsInstance,message,guild);
+            commandObject.runConsumer(argsInstance,event);
         }catch(NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e){
             e.printStackTrace();
         }
     }
 
-    public static Object[] parseArgument(ArrayList<String> contents, ChatCommandContainer containerObject, DiscordApi apiWrapper){
-        if(contents.size() < containerObject.nonOptionalArgCount()) return null;
+    public static Object[] parseArgument(ArrayList<String> contents, ChatCommandContainer<?> containerObject, DiscordApi apiWrapper){
+        if(contents.size() < containerObject.nonOptionalArgCount) return null;
 
-        Field[] orderedList = containerObject.orderedFieldList();
+        Field[] orderedList = containerObject.getOrderedFieldList();
         Object[] listObjects = new Object[orderedList.length];
         boolean hasMetCoalesc = false;
 

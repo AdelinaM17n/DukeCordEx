@@ -1,58 +1,33 @@
 package io.github.maheevil.dukecordex.commandhandler;
 
 import io.github.maheevil.dukecordex.DukeCordEx;
-import io.github.maheevil.dukecordex.commandhandler.annotations.ArgField;
-import io.github.maheevil.dukecordex.commandhandler.annotations.ChatCommand;
 import io.github.maheevil.dukecordex.commandhandler.annotations.NoArgs;
-import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.permission.PermissionType;
+import org.javacord.api.event.message.MessageCreateEvent;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class Extension {
-    public Message message = customConverter();
-    public void init(){
-        var methods = Arrays.stream(this.getClass().getDeclaredMethods()).filter(method -> method.isAnnotationPresent(ChatCommand.class));
-        methods.forEach(method -> {
-            var annotation = method.getAnnotation(ChatCommand.class);
-
-            if(DukeCordEx.CommandMap.containsKey(annotation.name())) {
-                System.err.println("Two commands cannot have the same name");
-                return;
-            }
-
-            var orderedFieldList = findOrderedFieldList(annotation.argsClass());
-
-            ChatCommandContainer container = new ChatCommandContainer(
-                    findNonOptionalArgCount(annotation.argsClass()),
-                    orderedFieldList,
-                    method,
-                    annotation.argsClass(),
-                    //typeList,
-                    annotation.requiredPerms(),
-                    this
-            );
-            DukeCordEx.CommandMap.put(annotation.name(), container);
-        });
+    protected final  <T>ChatCommandEntry registerChatCommand(String name, Class<T> tClass, PermissionType[] permissionTypes, BiConsumer<T, MessageCreateEvent> consumer){
+        if(!DukeCordEx.CommandMap.containsKey(name)) {
+            DukeCordEx.CommandMap.put(name, new ChatCommandContainer<T>(
+                    consumer, tClass,this,permissionTypes
+            ));
+            return new ChatCommandEntry(name,true);
+        }else {
+            return new ChatCommandEntry(name,false);
+        }
     }
 
-    private Field[] findOrderedFieldList(Class<?> clazz){
-        var fieldList = new ArrayList<>(Arrays.asList(clazz.getDeclaredFields()));
-        fieldList.removeIf(field -> !field.isAnnotationPresent(ArgField.class));
-        Field[] orderedList = new Field[fieldList.size()];
-        for(Field field : fieldList){ orderedList[field.getAnnotation(ArgField.class).index()] = field; }
-        return orderedList;
-    }
-
-    private int findNonOptionalArgCount(Class<?> clazz){
-        if(clazz == NoArgs.class) return 0;
-        var fieldList =  new ArrayList<>(Arrays.stream(clazz.getDeclaredFields()).toList());
-        fieldList.removeIf(field -> !field.isAnnotationPresent(ArgField.class) || (field.isAnnotationPresent(ArgField.class) && field.getAnnotation(ArgField.class).optional()));
-        return fieldList.size();
-    }
-
-    public <T>T customConverter(){
-        return null;
+    protected final ChatCommandEntry registerChatCommand(String name, PermissionType[] permissionTypes, Consumer<MessageCreateEvent> consumer){
+        if(!DukeCordEx.CommandMap.containsKey(name)) {
+            DukeCordEx.CommandMap.put(name, new ChatCommandContainer<>(
+                    consumer, NoArgs.class,this,permissionTypes
+            ));
+            return new ChatCommandEntry(name,true);
+        }else {
+            return new ChatCommandEntry(name,false);
+        }
     }
 }

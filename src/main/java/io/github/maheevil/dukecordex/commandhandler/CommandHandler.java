@@ -15,31 +15,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class CommandHandler<T> {
-    public static HashMap<Class<?>, ConvertorInterface> converterMap = new HashMap<>(Map.ofEntries(
-            Map.entry(String.class, (string , discordApi) -> string),
-            Map.entry(User.class, (string , discordApi) -> {
-                if(string.startsWith("<@")){
-                    return discordApi.getUserById(string.substring(2, 20)).exceptionally(x -> null).join();
-                }else{
-                    return discordApi.getUserById(string).exceptionally(x -> null).join();
-                }
-            }),
-            Map.entry(ServerTextChannel.class,(string, discordApi) -> {
-                if(string.startsWith("<#")){
-                    return discordApi.getServerTextChannelById(string.substring(2, 20)).orElse(null);
-                }else{
-                    return discordApi.getServerTextChannelById(string).orElse(null);
-                }
-            }),
-            Map.entry(Channel.class,((string, discordApi) -> {
-                if(string.startsWith("<#")){
-                    return discordApi.getChannelById(string.substring(2, 20)).orElse(null);
-                }else{
-                    return discordApi.getChannelById(string).orElse(null);
-                }
-            }))
-    ));
-
     public interface ConvertorInterface {
         Object get(String string,DiscordApi discordApi);
     }
@@ -63,23 +38,22 @@ public class CommandHandler<T> {
             return;
         }
 
-        var guild = event.getServer().orElseThrow();
         var commandUser = message.getUserAuthor().orElse(null);
+        var guild = event.getServer().orElseThrow();
 
         if(commandUser == null){
             message.reply("Something went wrong");
             return;
         }
 
-        if(!guild.hasPermissions(commandUser,commandObject.getRequiredPerms())){
+        if(commandObject.hasRequiredPerms && !guild.hasPermissions(commandUser,commandObject.getRequiredPerms())){
             message.reply("You are missing permissions needed for the command");
             return;
         }
 
         try{
             if(commandObject.argClass == NoArgs.class){
-                //commandObject.executionMethod().invoke(commandObject.extensionInstance,message,guild);
-                commandObject.runConsumer(null,event);
+                commandObject.runConsumer(null, event);
                 return;
             }
             var innerClass = commandObject.argClass;
@@ -135,4 +109,29 @@ public class CommandHandler<T> {
                 .anyMatch(field -> field != null && !field.getAnnotation(ArgField.class).optional())
                 ? null : listObjects;
     }
+
+    public static HashMap<Class<?>, ConvertorInterface> converterMap = new HashMap<>(Map.ofEntries(
+            Map.entry(String.class, (string , discordApi) -> string),
+            Map.entry(User.class, (string , discordApi) -> {
+                if(string.startsWith("<@")){
+                    return discordApi.getUserById(string.substring(2, 20)).exceptionally(x -> null).join();
+                }else{
+                    return discordApi.getUserById(string).exceptionally(x -> null).join();
+                }
+            }),
+            Map.entry(ServerTextChannel.class,(string, discordApi) -> {
+                if(string.startsWith("<#")){
+                    return discordApi.getServerTextChannelById(string.substring(2, 20)).orElse(null);
+                }else{
+                    return discordApi.getServerTextChannelById(string).orElse(null);
+                }
+            }),
+            Map.entry(Channel.class,((string, discordApi) -> {
+                if(string.startsWith("<#")){
+                    return discordApi.getChannelById(string.substring(2, 20)).orElse(null);
+                }else{
+                    return discordApi.getChannelById(string).orElse(null);
+                }
+            }))
+    ));
 }

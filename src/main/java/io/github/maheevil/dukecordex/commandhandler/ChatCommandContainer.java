@@ -19,6 +19,7 @@ public class ChatCommandContainer<T> {
     private final Field[] orderedFieldList;
     public final int nonOptionalArgCount;
     public final boolean hasNonOptionalArgs;
+    public final boolean hasRequiredPerms;
     public final Extension extensionInstance;
 
     public ChatCommandContainer(BiConsumer<T,MessageCreateEvent> BiConsumer, Class<T> argClass, Extension extension, PermissionType[] requiredPerms){
@@ -30,6 +31,7 @@ public class ChatCommandContainer<T> {
         this.orderedFieldList = initOrderedFieldList(argClass);
         this.nonOptionalArgCount = findNonOptionalArgCount(argClass);
         this.hasNonOptionalArgs = nonOptionalArgCount > 0;
+        this.hasRequiredPerms= requiredPerms != null && requiredPerms.length > 0;
     }
 
     public ChatCommandContainer(Consumer<MessageCreateEvent> consumer,Class<T> argClass,Extension extension, PermissionType[] requiredPerms){
@@ -41,6 +43,7 @@ public class ChatCommandContainer<T> {
         this.orderedFieldList = initOrderedFieldList(argClass);
         this.nonOptionalArgCount = findNonOptionalArgCount(argClass);
         this.hasNonOptionalArgs = nonOptionalArgCount > 0;
+        this.hasRequiredPerms= requiredPerms != null && requiredPerms.length >= 1;
     }
 
     public Field[] initOrderedFieldList(Class<?> argClass){

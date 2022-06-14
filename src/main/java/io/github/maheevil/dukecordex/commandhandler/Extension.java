@@ -30,4 +30,26 @@ public class Extension {
             return new ChatCommandEntry(name,false);
         }
     }
+
+    protected final  <T>ChatCommandEntry registerChatCommand(String name, Class<T> tClass, BiConsumer<T, MessageCreateEvent> consumer){
+        if(!DukeCordEx.CommandMap.containsKey(name)) {
+            DukeCordEx.CommandMap.put(name, new ChatCommandContainer<T>(
+                    consumer, tClass,this,null
+            ));
+            return new ChatCommandEntry(name,true);
+        }else {
+            return new ChatCommandEntry(name,false);
+        }
+    }
+
+    protected final ChatCommandEntry registerChatCommand(String name, Consumer<MessageCreateEvent> consumer){
+        if(!DukeCordEx.CommandMap.containsKey(name)) {
+            DukeCordEx.CommandMap.put(name, new ChatCommandContainer<>(
+                    consumer, NoArgs.class,this,null
+            ));
+            return new ChatCommandEntry(name,true);
+        }else {
+            return new ChatCommandEntry(name,false);
+        }
+    }
 }

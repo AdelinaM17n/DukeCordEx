@@ -2,6 +2,8 @@ package io.github.maheevil.dukecordex.commandhandler;
 
 import io.github.maheevil.dukecordex.DukeCordEx;
 import io.github.maheevil.dukecordex.commandhandler.annotations.NoArgs;
+import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandContext;
+import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandEx;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.event.message.MessageCreateEvent;
 
@@ -51,5 +53,14 @@ public class Extension {
         }else {
             return new ChatCommandEntry(name,false);
         }
+    }
+
+    protected final<T> Object registerBasicSlashCommand(
+            String baseName, String description, Class<T> argClass, BiConsumer<T,SlashCommandContext> consumer
+    ){
+        var bruh = new SlashCommandEx(baseName,description);
+        bruh.addBaseBrancingRunner("main",argClass,consumer);
+        DukeCordEx.SlashCommandMap.put(baseName,bruh);
+        return null;
     }
 }

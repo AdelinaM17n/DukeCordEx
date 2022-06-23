@@ -5,5 +5,5 @@ import java.util.HashMap;
 public class SlashCommandGroup {
     public String name;
     public String description;
-    public HashMap<String,SlashCommandRunner<?>> runners;
+    public HashMap<String,SlashCommandRunner<?>> runners = new HashMap<>();
 }

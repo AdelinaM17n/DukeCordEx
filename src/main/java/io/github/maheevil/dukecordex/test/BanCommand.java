@@ -11,6 +11,7 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.interaction.SlashCommandOptionType;
 
+import java.util.Locale;
 import java.util.function.BiConsumer;
 
 public class BanCommand extends Extension {
@@ -22,6 +23,39 @@ public class BanCommand extends Extension {
             (banCommandArgs, messageCreateEvent) -> {
                 messageCreateEvent.getMessage().reply("re").join();
             }
+    );
+
+    Object ttt = registerGroupedSlashCommand(
+            "named",
+            "grouped",
+            SlashCommandCreator.createGroup(
+                    "group",
+                    "eee",
+                    SlashCommandCreator.create(
+                            "test", "test",
+                            BaneCommandArgs.class,
+                            (baneCommandArgs, slashCommandContext) -> {}
+                    ),
+                    SlashCommandCreator.create(
+                            "teste", "test",
+                            BaneCommandArgs.class,
+                            (baneCommandArgs, slashCommandContext) -> {}
+                    )
+            ),
+            SlashCommandCreator.createGroup(
+                    "hroup",
+                    "eee",
+                    SlashCommandCreator.create(
+                            "htest", "test",
+                            BaneCommandArgs.class,
+                            (baneCommandArgs, slashCommandContext) -> {}
+                    ),
+                    SlashCommandCreator.create(
+                            "hteste", "test",
+                            BaneCommandArgs.class,
+                            (baneCommandArgs, slashCommandContext) -> {}
+                    )
+            )
     );
 
     Object cgg = registerBasicSlashCommand(

@@ -41,12 +41,59 @@ public class SlashCommandRegisterer {
                             if(!error.get()) command.createForServer(api.getServerById("870341202652827648").orElseThrow());
                             else System.err.println("Parsing arguments failed");
                         }
+                    } else if(!entry.slashCommandGroups.isEmpty()) {
+                        entry.slashCommandGroups.values().forEach(
+                                slashCommandGroup -> {
+                                    List<SlashCommandOption> groupedSubCommands = getGroupSubComList(slashCommandGroup);
+                                    command.addOption(SlashCommandOption.createWithOptions(
+                                            SlashCommandOptionType.SUB_COMMAND_GROUP,
+                                            slashCommandGroup.name,
+                                            slashCommandGroup.description,
+                                            groupedSubCommands
+                                    ));
+                                }
+                        );
+                        // TODO - VERY FUCKING URGENT - BETTER ERROR HANDLING
+                        command.createForServer(api.getServerById("870341202652827648").orElseThrow());
                     }
                 }
         );
     }
 
-    public static boolean parseBaseSubCommands(SlashCommandRunner<?> subcom, SlashCommandBuilder command){
+    public static List<SlashCommandOption> getGroupSubComList(SlashCommandGroup group){
+        List<SlashCommandOption> list = new ArrayList<>();
+        group.runners.values().forEach(
+                subCommandRunner -> {
+                    List<SlashCommandOption> argsOptionsList = parseArgList(subCommandRunner);
+
+                    if(argsOptionsList == null){
+                        System.err.println("Error");
+                        return;
+                    }
+
+                    if(!argsOptionsList.isEmpty()){
+                        list.add(
+                                SlashCommandOption.createWithOptions(
+                                        SlashCommandOptionType.SUB_COMMAND,
+                                        subCommandRunner.name,
+                                        subCommandRunner.description,
+                                        argsOptionsList
+                                )
+                        );
+                    }else {
+                        list.add(
+                                SlashCommandOption.create(
+                                        SlashCommandOptionType.SUB_COMMAND,
+                                        subCommandRunner.name,
+                                        subCommandRunner.description
+                                )
+                        );
+                    }
+                }
+        );
+        return list;
+    }
+    public static List<SlashCommandOption> parseArgList(SlashCommandRunner<?> subcom){
         AtomicBoolean encounteredError = new AtomicBoolean(false);
         List<SlashCommandOption> argsOptionsList = new ArrayList<>();
 
@@ -69,8 +116,12 @@ public class SlashCommandRegisterer {
                             );
                         }
                 );
+        return encounteredError.get() ? null : argsOptionsList;
+    }
+    public static boolean parseBaseSubCommands(SlashCommandRunner<?> subcom, SlashCommandBuilder command){
+        List<SlashCommandOption> argsOptionsList = parseArgList(subcom);
 
-        if(encounteredError.get()) return false;
+        if(argsOptionsList == null) return false;
 
         if(!argsOptionsList.isEmpty()){
             command.addOption(SlashCommandOption.createWithOptions(
@@ -89,8 +140,6 @@ public class SlashCommandRegisterer {
 
        return true;
     }
-
-    //public static boolean
 
     public static boolean parseArgs(Field field, SlashCommandBuilder command){
         var annotation = field.getAnnotation(SlashCommandArgField.class);

@@ -3,6 +3,7 @@ package io.github.maheevil.dukecordex.test;
 import io.github.maheevil.dukecordex.commandhandler.ChatCommandEntry;
 import io.github.maheevil.dukecordex.commandhandler.Extension;
 import io.github.maheevil.dukecordex.commandhandler.annotations.*;
+import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandCreator;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.server.Server;
@@ -23,12 +24,28 @@ public class BanCommand extends Extension {
             }
     );
 
+    Object cgg = registerBasicSlashCommand(
+            "ea",
+            "ea",
+            SlashCommandCreator.create(
+                    "test", "test",
+                    BaneCommandArgs.class,
+                    (baneCommandArgs, slashCommandContext) -> {}
+            ),
+            SlashCommandCreator.create(
+                    "teste", "test",
+                    BaneCommandArgs.class,
+                    (baneCommandArgs, slashCommandContext) -> {}
+            )
+    );
+
     Object command = registerBasicSlashCommand(
             "ban",
             "ban",
             BaneCommandArgs.class,
             (x,v) -> {}
-            );
+
+    );
 
     @ArgInnerClass
     public class BanCommandArgs {

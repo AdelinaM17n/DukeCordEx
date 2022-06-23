@@ -4,7 +4,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class SlashCommandRunner<T> {
-    String name;
+    public String name;
+    public String description;
     public Class<T> argsClass;
     public Consumer<SlashCommandContext> consumer;
     public BiConsumer<T,SlashCommandContext> biConsumer;

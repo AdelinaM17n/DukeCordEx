@@ -2,17 +2,12 @@ package io.github.maheevil.dukecordex;
 
 import io.github.maheevil.dukecordex.commandhandler.ChatCommandContainer;
 import io.github.maheevil.dukecordex.commandhandler.CommandHandler;
-import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandCreatorUtils;
+import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandRegisterer;
 import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandEx;
 import io.github.maheevil.dukecordex.test.BanCommand;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
-import org.javacord.api.interaction.SlashCommand;
-import org.javacord.api.interaction.SlashCommandOption;
-import org.javacord.api.interaction.SlashCommandOptionChoice;
-import org.javacord.api.interaction.SlashCommandOptionType;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.function.Predicate;
 
@@ -28,7 +23,7 @@ public class DukeCordEx{
        System.out.println("done");
        api = discordApi;
        init(discordApi);
-       SlashCommandCreatorUtils.pushAllSlashCommands(SlashCommandMap.values().stream().toList(),api);
+       SlashCommandRegisterer.pushAllSlashCommands(SlashCommandMap.values().stream().toList(),api);
     }
 
     public static void init(DiscordApi discordApi){

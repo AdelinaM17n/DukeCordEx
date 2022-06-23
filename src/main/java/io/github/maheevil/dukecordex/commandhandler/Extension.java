@@ -4,9 +4,11 @@ import io.github.maheevil.dukecordex.DukeCordEx;
 import io.github.maheevil.dukecordex.commandhandler.annotations.NoArgs;
 import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandContext;
 import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandEx;
+import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandRunner;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.event.message.MessageCreateEvent;
 
+import java.util.Arrays;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -60,6 +62,19 @@ public class Extension {
     ){
         var bruh = new SlashCommandEx(baseName,description);
         bruh.addBaseBrancingRunner("main",argClass,consumer);
+        DukeCordEx.SlashCommandMap.put(baseName,bruh);
+        return null;
+    }
+    @SafeVarargs
+    protected final<T> Object registerBasicSlashCommand(
+            String baseName, String description, SlashCommandRunner<T>... slashCommandRunners
+    ){
+        var bruh = new SlashCommandEx(baseName,description);
+        Arrays.stream(slashCommandRunners).forEach(
+                tSlashCommandRunner -> {
+                    bruh.baseBranchingCommands.put(tSlashCommandRunner.name,tSlashCommandRunner);
+                }
+        );
         DukeCordEx.SlashCommandMap.put(baseName,bruh);
         return null;
     }

@@ -1,5 +1,7 @@
 package io.github.maheevil.dukecordex.commandhandler.slashcommands;
 
+import org.javacord.api.event.interaction.SlashCommandCreateEvent;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -15,7 +17,7 @@ public class SlashCommandEx {
         this.description = description;
     }
 
-    public <T>void addBaseBrancingRunner(String name,Class<T> argClass ,BiConsumer<T,SlashCommandContext> consumer){
+    public <T>void addBaseBrancingRunner(String name,Class<T> argClass ,BiConsumer<T, SlashCommandCreateEvent> consumer){
         var instance = new SlashCommandRunner<T>();
         instance.argsClass = argClass;
         instance.biConsumer = consumer;

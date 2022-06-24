@@ -2,6 +2,7 @@ package io.github.maheevil.dukecordex.commandhandler;
 
 import io.github.maheevil.dukecordex.DukeCordEx;
 import io.github.maheevil.dukecordex.commandhandler.annotations.NoArgs;
+import io.github.maheevil.dukecordex.commandhandler.annotations.SlashCommandArgField;
 import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandEx;
 import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandGroup;
 import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandRunner;
@@ -9,7 +10,9 @@ import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.event.interaction.SlashCommandCreateEvent;
 import org.javacord.api.event.message.MessageCreateEvent;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -63,12 +66,17 @@ public class Extension {
             String baseName, String description, Class<T> argClass, BiConsumer<T, SlashCommandCreateEvent> consumer
     ){
         var commandInstance = new SlashCommandEx(baseName,description);
+        var hashMap = new HashMap<String, Field>();
+        Arrays.stream(argClass.getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(SlashCommandArgField.class))
+                .forEach(field -> hashMap.put(field.getName(), field));
         commandInstance.baseBranchingCommands.put(
                 "main",
                 new SlashCommandRunner<>(
                         "main",
                         null,
                         argClass,
+                        hashMap,
                         consumer
                 )
         );

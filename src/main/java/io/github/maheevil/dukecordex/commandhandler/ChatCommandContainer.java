@@ -12,9 +12,9 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class ChatCommandContainer<T> {
-    private final BiConsumer<T, MessageCreateEvent> BiConsumer;
+    private final BiConsumer<T, MessageCreateEvent> biConsumer;
     private final Consumer<MessageCreateEvent> consumer;
-    public Class<T> argClass;
+    public final Class<T> argClass;
     private final PermissionType[] requiredPerms;
     private final Field[] orderedFieldList;
     public final int nonOptionalArgCount;
@@ -23,7 +23,7 @@ public class ChatCommandContainer<T> {
     public final Extension extensionInstance;
 
     public ChatCommandContainer(BiConsumer<T,MessageCreateEvent> BiConsumer, Class<T> argClass, Extension extension, PermissionType[] requiredPerms){
-        this.BiConsumer = BiConsumer;
+        this.biConsumer = BiConsumer;
         this.consumer = null;
         this.argClass = argClass;
         this.requiredPerms = requiredPerms;
@@ -35,7 +35,7 @@ public class ChatCommandContainer<T> {
     }
 
     public ChatCommandContainer(Consumer<MessageCreateEvent> consumer,Class<T> argClass,Extension extension, PermissionType[] requiredPerms){
-        this.BiConsumer = null;
+        this.biConsumer = null;
         this.consumer = consumer;
         this.requiredPerms = requiredPerms;
         this.extensionInstance = extension;
@@ -71,7 +71,7 @@ public class ChatCommandContainer<T> {
 
     public void runConsumer(Object argObject, MessageCreateEvent context){
         if(argObject != null)
-            this.BiConsumer.accept(this.argClass.cast(argObject),context);
+            this.biConsumer.accept(this.argClass.cast(argObject),context);
         else
             this.consumer.accept(context);
     }

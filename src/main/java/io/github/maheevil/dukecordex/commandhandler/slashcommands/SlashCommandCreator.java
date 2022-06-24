@@ -1,17 +1,25 @@
 package io.github.maheevil.dukecordex.commandhandler.slashcommands;
 
+import io.github.maheevil.dukecordex.commandhandler.annotations.SlashCommandArgField;
 import org.javacord.api.event.interaction.SlashCommandCreateEvent;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class SlashCommandCreator{
     public static <T>SlashCommandRunner<T> create(String name, String description, Class<T> argClass, BiConsumer<T, SlashCommandCreateEvent> consumer){
+        var hashMap = new HashMap<String, Field>();
+        Arrays.stream(argClass.getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(SlashCommandArgField.class))
+                .forEach(field -> hashMap.put(field.getName(), field));
         return new SlashCommandRunner<>(
                 name,
                 description,
                 argClass,
+                hashMap,
                 consumer
         );
     }

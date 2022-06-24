@@ -16,8 +16,8 @@ import java.util.function.Consumer;
 public class Extension {
     protected final  <T>ChatCommandEntry registerChatCommand(String name, Class<T> tClass, PermissionType[] permissionTypes, BiConsumer<T, MessageCreateEvent> consumer){
         if(!DukeCordEx.CommandMap.containsKey(name)) {
-            DukeCordEx.CommandMap.put(name, new ChatCommandContainer<T>(
-                    consumer, tClass,this,permissionTypes
+            DukeCordEx.CommandMap.put(name, new ChatCommandContainer<>(
+                    consumer, tClass, this, permissionTypes
             ));
             return new ChatCommandEntry(name,true);
         }else {
@@ -38,8 +38,8 @@ public class Extension {
 
     protected final  <T>ChatCommandEntry registerChatCommand(String name, Class<T> tClass, BiConsumer<T, MessageCreateEvent> consumer){
         if(!DukeCordEx.CommandMap.containsKey(name)) {
-            DukeCordEx.CommandMap.put(name, new ChatCommandContainer<T>(
-                    consumer, tClass,this,null
+            DukeCordEx.CommandMap.put(name, new ChatCommandContainer<>(
+                    consumer, tClass, this, null
             ));
             return new ChatCommandEntry(name,true);
         }else {
@@ -61,27 +61,35 @@ public class Extension {
     protected final<T> Object registerBasicSlashCommand(
             String baseName, String description, Class<T> argClass, BiConsumer<T, SlashCommandCreateEvent> consumer
     ){
-        var bruh = new SlashCommandEx(baseName,description);
-        bruh.addBaseBrancingRunner("main",argClass,consumer);
-        DukeCordEx.SlashCommandMap.put(baseName,bruh);
+        var commandInstance = new SlashCommandEx(baseName,description);
+        commandInstance.baseBranchingCommands.put(
+                "main",
+                new SlashCommandRunner<>(
+                        "main",
+                        null,
+                        argClass,
+                        consumer
+                )
+        );
+        DukeCordEx.SlashCommandMap.put(baseName,commandInstance);
         return null;
     }
     @SafeVarargs
     protected final<T> Object registerBasicSlashCommand(String baseName, String description, SlashCommandRunner<T>... slashCommandRunners){
-        var bruh = new SlashCommandEx(baseName,description);
+        var baseCommandInstance = new SlashCommandEx(baseName,description);
         Arrays.stream(slashCommandRunners).forEach(
-                tSlashCommandRunner -> bruh.baseBranchingCommands.put(tSlashCommandRunner.name,tSlashCommandRunner)
+                tSlashCommandRunner -> baseCommandInstance.baseBranchingCommands.put(tSlashCommandRunner.name,tSlashCommandRunner)
         );
-        DukeCordEx.SlashCommandMap.put(baseName,bruh);
+        DukeCordEx.SlashCommandMap.put(baseName,baseCommandInstance);
         return null;
     }
 
     protected final Object registerGroupedSlashCommand(String baseName, String description, SlashCommandGroup... slashCommandGroups){
-        var bruhe = new SlashCommandEx(baseName,description);
+        var baseCommandInstance = new SlashCommandEx(baseName,description);
         Arrays.stream(slashCommandGroups).forEach(
-                slashCommandGroup -> bruhe.slashCommandGroups.put(slashCommandGroup.name, slashCommandGroup)
+                slashCommandGroup -> baseCommandInstance.slashCommandGroups.put(slashCommandGroup.name, slashCommandGroup)
         );
-        DukeCordEx.SlashCommandMap.put(baseName,bruhe);
+        DukeCordEx.SlashCommandMap.put(baseName,baseCommandInstance);
         return null;
     }
 }

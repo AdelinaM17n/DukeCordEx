@@ -23,11 +23,14 @@ public class SlashCommandRegisterer {
                         if(entry.baseBranchingCommands.containsKey("main") && entry.baseBranchingCommands.size() < 2){
                             AtomicBoolean error = new AtomicBoolean(false);
 
-                            Arrays.stream(entry.baseBranchingCommands.get("main").argsClass.getDeclaredFields())
-                                    .filter(field -> field.isAnnotationPresent(SlashCommandArgField.class))
-                                    .forEach(field -> error.set(!parseArgs(field, command)));
+                            var runner = entry.baseBranchingCommands.get("main");
+                            if(runner.argsClass != null){
+                                Arrays.stream(runner.argsClass.getDeclaredFields())
+                                        .filter(field -> field.isAnnotationPresent(SlashCommandArgField.class))
+                                        .forEach(field -> error.set(!parseArgs(field, command)));
+                            }
 
-                            // TODO - URGENT. ADD GUILD SPECIFIC AND GLOBAL OPTIONS
+                            //TODO - URGENT. ADD GUILD SPECIFIC AND GLOBAL OPTIONS
                             if(!error.get()) command.createForServer(api.getServerById("870341202652827648").orElseThrow());
                             else System.err.println("Parsing arguments failed");
 

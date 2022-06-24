@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+@SuppressWarnings("SameParameterValue")
 public class Extension {
     protected final  <T>ChatCommandEntry registerChatCommand(String name, Class<T> tClass, PermissionType[] permissionTypes, BiConsumer<T, MessageCreateEvent> consumer){
         if(!DukeCordEx.CommandMap.containsKey(name)) {
@@ -68,6 +69,22 @@ public class Extension {
                         "main",
                         null,
                         argClass,
+                        consumer
+                )
+        );
+        DukeCordEx.SlashCommandMap.put(baseName,commandInstance);
+        return null;
+    }
+
+    protected final<T> Object registerBasicSlashCommand(
+            String baseName, String description, Consumer<SlashCommandCreateEvent> consumer
+    ){
+        var commandInstance = new SlashCommandEx(baseName,description);
+        commandInstance.baseBranchingCommands.put(
+                "main",
+                new SlashCommandRunner<>(
+                        "main",
+                        null,
                         consumer
                 )
         );

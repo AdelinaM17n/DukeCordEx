@@ -4,6 +4,7 @@ import org.javacord.api.event.interaction.SlashCommandCreateEvent;
 
 import java.util.Arrays;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class SlashCommandCreator{
     public static <T>SlashCommandRunner<T> create(String name, String description, Class<T> argClass, BiConsumer<T, SlashCommandCreateEvent> consumer){
@@ -11,6 +12,14 @@ public class SlashCommandCreator{
                 name,
                 description,
                 argClass,
+                consumer
+        );
+    }
+
+    public static <T>SlashCommandRunner<T> create(String name, String description, Consumer<SlashCommandCreateEvent> consumer){
+        return new SlashCommandRunner<>(
+                name,
+                description,
                 consumer
         );
     }

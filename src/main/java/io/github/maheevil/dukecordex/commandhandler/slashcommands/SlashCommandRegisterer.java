@@ -30,8 +30,7 @@ public class SlashCommandRegisterer {
                                         .forEach(field -> error.set(!parseArgs(field, command)));
                             }
 
-                            //TODO - URGENT. ADD GUILD SPECIFIC AND GLOBAL OPTIONS
-                            if(!error.get()) command.createForServer(api.getServerById("870341202652827648").orElseThrow());
+                            if(!error.get()) pushToDiscord(command, api, entry.guildOrNotId);
                             else System.err.println("Parsing arguments failed");
 
                         }else if(entry.baseBranchingCommands.size() > 1){
@@ -41,8 +40,9 @@ public class SlashCommandRegisterer {
                                     baseSubCommand -> error.set(!parseBaseSubCommands(baseSubCommand,command))
                             );
 
-                            if(!error.get()) command.createForServer(api.getServerById("870341202652827648").orElseThrow());
+                            if(!error.get()) pushToDiscord(command, api, entry.guildOrNotId);
                             else System.err.println("Parsing arguments failed");
+
                         }
                     } else if(!entry.slashCommandGroups.isEmpty()) {
                         entry.slashCommandGroups.values().forEach(
@@ -57,12 +57,22 @@ public class SlashCommandRegisterer {
                                 }
                         );
                         // TODO - VERY FUCKING URGENT - BETTER ERROR HANDLING
-                        command.createForServer(api.getServerById("870341202652827648").orElseThrow());
+                        pushToDiscord(
+                                command, api, entry.guildOrNotId
+                        );
+
                     }
                 }
         );
     }
 
+    private static void pushToDiscord(SlashCommandBuilder command, DiscordApi api, String guildOrNotId){
+        if(guildOrNotId.equals("GLOBAL")) {
+            command.createGlobal(api);
+        }else {
+            command.createForServer(api.getServerById(guildOrNotId).orElseThrow());
+        }
+    }
     public static List<SlashCommandOption> getGroupSubComList(SlashCommandGroup group){
         List<SlashCommandOption> list = new ArrayList<>();
         group.runners.values().forEach(

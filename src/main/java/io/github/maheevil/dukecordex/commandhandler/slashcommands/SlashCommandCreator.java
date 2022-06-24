@@ -15,6 +15,7 @@ public class SlashCommandCreator{
         Arrays.stream(argClass.getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(SlashCommandArgField.class))
                 .forEach(field -> hashMap.put(field.getName(), field));
+
         return new SlashCommandRunner<>(
                 name,
                 description,

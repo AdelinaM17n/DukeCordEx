@@ -18,7 +18,14 @@ import java.util.function.Consumer;
 
 @SuppressWarnings("SameParameterValue")
 public class Extension {
-    protected final  <T>ChatCommandEntry registerChatCommand(String name, Class<T> tClass, PermissionType[] permissionTypes, BiConsumer<T, MessageCreateEvent> consumer){
+    protected static String configSetting(){
+        return "GLOBAL";
+        //TODO - AN ACTUAL FUCKING CONFIG SYSTEM
+    }
+    protected static String global(){
+        return "GLOBAL";
+    }
+    protected final <T>ChatCommandEntry registerChatCommand(String name, Class<T> tClass, PermissionType[] permissionTypes, BiConsumer<T, MessageCreateEvent> consumer){
         if(!DukeCordEx.CommandMap.containsKey(name)) {
             DukeCordEx.CommandMap.put(name, new ChatCommandContainer<>(
                     consumer, tClass, this, permissionTypes
@@ -40,7 +47,7 @@ public class Extension {
         }
     }
 
-    protected final  <T>ChatCommandEntry registerChatCommand(String name, Class<T> tClass, BiConsumer<T, MessageCreateEvent> consumer){
+    protected final <T>ChatCommandEntry registerChatCommand(String name, Class<T> tClass, BiConsumer<T, MessageCreateEvent> consumer){
         if(!DukeCordEx.CommandMap.containsKey(name)) {
             DukeCordEx.CommandMap.put(name, new ChatCommandContainer<>(
                     consumer, tClass, this, null
@@ -63,9 +70,9 @@ public class Extension {
     }
 
     protected final<T> Object registerBasicSlashCommand(
-            String baseName, String description, Class<T> argClass, BiConsumer<T, SlashCommandCreateEvent> consumer
+            String baseName, String description, String guild, Class<T> argClass, BiConsumer<T, SlashCommandCreateEvent> consumer
     ){
-        var commandInstance = new SlashCommandEx(baseName,description);
+        var commandInstance = new SlashCommandEx(baseName,description,guild);
         var hashMap = new HashMap<String, Field>();
         Arrays.stream(argClass.getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(SlashCommandArgField.class))
@@ -85,9 +92,9 @@ public class Extension {
     }
 
     protected final<T> Object registerBasicSlashCommand(
-            String baseName, String description, Consumer<SlashCommandCreateEvent> consumer
+            String baseName, String description, String guild, Consumer<SlashCommandCreateEvent> consumer
     ){
-        var commandInstance = new SlashCommandEx(baseName,description);
+        var commandInstance = new SlashCommandEx(baseName,description,guild);
         commandInstance.baseBranchingCommands.put(
                 "main",
                 new SlashCommandRunner<>(
@@ -100,8 +107,8 @@ public class Extension {
         return null;
     }
     @SafeVarargs
-    protected final<T> Object registerBasicSlashCommand(String baseName, String description, SlashCommandRunner<T>... slashCommandRunners){
-        var baseCommandInstance = new SlashCommandEx(baseName,description);
+    protected final<T> Object registerBasicSlashCommand(String baseName, String description, String guild, SlashCommandRunner<T>... slashCommandRunners){
+        var baseCommandInstance = new SlashCommandEx(baseName,description,guild);
         Arrays.stream(slashCommandRunners).forEach(
                 tSlashCommandRunner -> baseCommandInstance.baseBranchingCommands.put(tSlashCommandRunner.name,tSlashCommandRunner)
         );
@@ -109,8 +116,8 @@ public class Extension {
         return null;
     }
 
-    protected final Object registerGroupedSlashCommand(String baseName, String description, SlashCommandGroup... slashCommandGroups){
-        var baseCommandInstance = new SlashCommandEx(baseName,description);
+    protected final Object registerGroupedSlashCommand(String baseName, String description, String guild, SlashCommandGroup... slashCommandGroups){
+        var baseCommandInstance = new SlashCommandEx(baseName,description,guild);
         Arrays.stream(slashCommandGroups).forEach(
                 slashCommandGroup -> baseCommandInstance.slashCommandGroups.put(slashCommandGroup.name, slashCommandGroup)
         );

@@ -28,6 +28,7 @@ public class BanCommand extends Extension {
     Object ttt = registerGroupedSlashCommand(
             "named",
             "grouped",
+            "870341202652827648",
             SlashCommandCreator.createGroup(
                     "group",
                     "eee",
@@ -61,6 +62,7 @@ public class BanCommand extends Extension {
     Object cgg = registerBasicSlashCommand(
             "ea",
             "ea",
+            "870341202652827648",
             SlashCommandCreator.create(
                     "test", "test",
                     BaneCommandArgs.class,
@@ -76,6 +78,7 @@ public class BanCommand extends Extension {
     Object command = registerBasicSlashCommand(
             "ban",
             "ban",
+            "870341202652827648",
             BaneCommandArgs.class,
             (x,v) -> {}
 

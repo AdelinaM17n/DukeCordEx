@@ -4,6 +4,6 @@ import org.javacord.api.event.interaction.SlashCommandCreateEvent;
 
 public class SlashCommandHandler {
     public static void handleSlashCommandEvent(SlashCommandCreateEvent event){
-
+        //var guild = event.getSlashCommandInteraction().getServer();
     }
 }

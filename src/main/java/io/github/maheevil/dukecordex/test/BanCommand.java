@@ -25,7 +25,7 @@ public class BanCommand extends Extension {
             }
     );
 
-    /*Object ttt = registerGroupedSlashCommand(
+    Object ttt = registerGroupedSlashCommand(
             "named",
             "grouped",
             "870341202652827648",
@@ -35,12 +35,18 @@ public class BanCommand extends Extension {
                     SlashCommandCreator.create(
                             "test", "test",
                             BaneCommandArgs.class,
-                            (baneCommandArgs, slashCommandContext) -> {}
+                            (baneCommandArgs,slashCommandCreateEvent) -> {
+                                slashCommandCreateEvent.getSlashCommandInteraction().createImmediateResponder().append("Hello").respond().join();
+                                System.out.println("Yay" + baneCommandArgs.reasonArg);
+                            }
                     ),
                     SlashCommandCreator.create(
                             "teste", "test",
                             BaneCommandArgs.class,
-                            (baneCommandArgs, slashCommandContext) -> {}
+                            (baneCommandArgs,slashCommandCreateEvent) -> {
+                                slashCommandCreateEvent.getSlashCommandInteraction().createImmediateResponder().append("Hello").respond().join();
+                                System.out.println("Yay" + baneCommandArgs.reasonArg);
+                            }
                     )
             ),
             SlashCommandCreator.createGroup(
@@ -49,12 +55,18 @@ public class BanCommand extends Extension {
                     SlashCommandCreator.create(
                             "htest", "test",
                             BaneCommandArgs.class,
-                            (baneCommandArgs, slashCommandContext) -> {}
+                            (baneCommandArgs,slashCommandCreateEvent) -> {
+                                slashCommandCreateEvent.getSlashCommandInteraction().createImmediateResponder().append("Hello").respond().join();
+                                System.out.println("Yay" + baneCommandArgs.reasonArg);
+                            }
                     ),
                     SlashCommandCreator.create(
                             "hteste", "test",
                             BaneCommandArgs.class,
-                            (baneCommandArgs, slashCommandContext) -> {}
+                            (baneCommandArgs,slashCommandCreateEvent) -> {
+                                slashCommandCreateEvent.getSlashCommandInteraction().createImmediateResponder().append("Hello").respond().join();
+                                System.out.println("Yay" + baneCommandArgs.reasonArg);
+                            }
                     )
             )
     );
@@ -66,23 +78,29 @@ public class BanCommand extends Extension {
             SlashCommandCreator.create(
                     "test", "test",
                     BaneCommandArgs.class,
-                    (baneCommandArgs, slashCommandContext) -> {}
+                    (baneCommandArgs,slashCommandCreateEvent) -> {
+                        slashCommandCreateEvent.getSlashCommandInteraction().createImmediateResponder().append("Hello").respond().join();
+                        System.out.println("Yay" + baneCommandArgs.reasonArg);
+                    }
             ),
             SlashCommandCreator.create(
                     "teste", "test",
                     BaneCommandArgs.class,
-                    (baneCommandArgs, slashCommandContext) -> {}
+                    (baneCommandArgs,slashCommandCreateEvent) -> {
+                        slashCommandCreateEvent.getSlashCommandInteraction().createImmediateResponder().append("Hello").respond().join();
+                        System.out.println("Yay" + baneCommandArgs.reasonArg);
+                    }
             )
-    );*/
+    );
 
     Object command = registerBasicSlashCommand(
             "ban",
             "ban",
             "870341202652827648",
             BaneCommandArgs.class,
-            (x,v) -> {
-                v.getSlashCommandInteraction().createImmediateResponder().append("Hello").respond().join();
-                System.out.println("Yay" + x.reasonArg);
+            (baneCommandArgs,slashCommandCreateEvent) -> {
+                slashCommandCreateEvent.getSlashCommandInteraction().createImmediateResponder().append("Hello").respond().join();
+                System.out.println("Yay" + baneCommandArgs.reasonArg);
             }
 
     );

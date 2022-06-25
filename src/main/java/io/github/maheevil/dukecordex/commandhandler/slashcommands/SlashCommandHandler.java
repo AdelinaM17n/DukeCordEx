@@ -6,13 +6,11 @@ import io.github.maheevil.dukecordex.commandhandler.annotations.SlashCommandArgF
 import org.javacord.api.event.interaction.SlashCommandCreateEvent;
 import org.javacord.api.interaction.SlashCommandInteraction;
 import org.javacord.api.interaction.SlashCommandInteractionOption;
-import org.javacord.api.interaction.SlashCommandOption;
 import org.javacord.api.interaction.SlashCommandOptionType;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SlashCommandHandler {
     public static void handleSlashCommandEvent(SlashCommandCreateEvent event) {
@@ -23,29 +21,50 @@ public class SlashCommandHandler {
         }
 
         var commandInstance = DukeCordEx.SlashCommandMap.get(slashCommandInteraction.getCommandName());
-        var firstOption = slashCommandInteraction.getOptionByIndex(0).orElse(null);
+        var baseSubfirstOption = slashCommandInteraction.getOptionByIndex(0).orElse(null);
 
-        if(firstOption == null || !firstOption.isSubcommandOrGroup()){
-            if(!commandInstance.baseBranchingCommands.containsKey("main")){
-                System.err.println("Invalid command registration");
-                return;
-            }
-
-            var mainRunner = commandInstance.baseBranchingCommands.get("main");
-
-            if(firstOption == null){
-                mainRunner.runConsumer(null,event);
-                //return;
-            }else {
+        if(baseSubfirstOption == null || !baseSubfirstOption.isSubcommandOrGroup()){
+            runCommandRunner(
+                    "main",
+                    commandInstance.baseBranchingCommands,
+                    baseSubfirstOption,
+                    slashCommandInteraction,
+                    event,
+                    commandInstance.extensionInstance
+            );
+        }else{
+            var subFirstOption = baseSubfirstOption.getOptionByIndex(0).orElse(null);
+            if(subFirstOption == null || !subFirstOption.isSubcommandOrGroup()){
                 runCommandRunner(
-                        "main",
+                        baseSubfirstOption.getName(),
                         commandInstance.baseBranchingCommands,
-                        firstOption,
-                        slashCommandInteraction,
+                        subFirstOption,
+                        baseSubfirstOption,
                         event,
                         commandInstance.extensionInstance
                 );
+            }else {
+                var subSubFirstOption = subFirstOption.getOptionByIndex(0).orElse(null);
+
+                if(!commandInstance.slashCommandGroups.containsKey(baseSubfirstOption.getName())){
+                    System.err.println("Invalide Command registration");
+                    return;
+                }
+
+                if(subSubFirstOption == null || !subSubFirstOption.isSubcommandOrGroup()){
+                    runCommandRunner(
+                            subFirstOption.getName(),
+                            commandInstance.slashCommandGroups.get(baseSubfirstOption.getName()).runners,
+                            subSubFirstOption,
+                            subFirstOption,
+                            event,
+                            commandInstance.extensionInstance
+                    );
+                }else {
+                    System.err.println("How did we get here? - received an invalid slash command run object");
+                }
             }
+
         }
     }
 

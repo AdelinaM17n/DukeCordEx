@@ -4,6 +4,7 @@ import org.javacord.api.event.interaction.SlashCommandCreateEvent;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -11,11 +12,11 @@ public class SlashCommandRunner<T> {
     public final String name;
     public final String description;
     public final Class<T> argsClass;
-    public final HashMap<String,Field> filteredFieldList;
+    public final List<Field> filteredFieldList;
     private final Consumer<SlashCommandCreateEvent> consumer;
     private final BiConsumer<T,SlashCommandCreateEvent> biConsumer;
 
-    public SlashCommandRunner(String name, String description, Class<T> argsClass,HashMap<String,Field> hashMap, BiConsumer<T,SlashCommandCreateEvent> consumer){
+    public SlashCommandRunner(String name, String description, Class<T> argsClass,List<Field> hashMap, BiConsumer<T,SlashCommandCreateEvent> consumer){
         this.name = name;
         this.description = description;
         this.argsClass = argsClass;

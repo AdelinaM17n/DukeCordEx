@@ -11,16 +11,15 @@ import java.util.function.Consumer;
 
 public class SlashCommandCreator{
     public static <T>SlashCommandRunner<T> create(String name, String description, Class<T> argClass, BiConsumer<T, SlashCommandCreateEvent> consumer){
-        var hashMap = new HashMap<String, Field>();
-        Arrays.stream(argClass.getDeclaredFields())
+        var fieldList = Arrays.stream(argClass.getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(SlashCommandArgField.class))
-                .forEach(field -> hashMap.put(field.getName(), field));
+                .toList();
 
         return new SlashCommandRunner<>(
                 name,
                 description,
                 argClass,
-                hashMap,
+                fieldList,
                 consumer
         );
     }

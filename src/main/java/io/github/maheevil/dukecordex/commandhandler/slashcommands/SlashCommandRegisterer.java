@@ -116,7 +116,7 @@ public class SlashCommandRegisterer {
                             var annotation = field.getAnnotation(SlashCommandArgField.class);
                             if(annotation.type() == SlashCommandOptionType.SUB_COMMAND){
                                 System.err.println("Invalid Slash Command arg configuration");
-                                encounteredError.set(false);
+                                encounteredError.set(true);
                                 return;
                             }
                             argsOptionsList.add(

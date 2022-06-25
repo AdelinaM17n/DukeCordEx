@@ -2,6 +2,7 @@ package io.github.maheevil.dukecordex;
 
 import io.github.maheevil.dukecordex.commandhandler.ChatCommandContainer;
 import io.github.maheevil.dukecordex.commandhandler.CommandHandler;
+import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandHandler;
 import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandRegisterer;
 import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandEx;
 import io.github.maheevil.dukecordex.test.BanCommand;
@@ -28,6 +29,7 @@ public class DukeCordEx{
 
     public static void init(DiscordApi discordApi){
         discordApi.addMessageCreateListener(CommandHandler::onMessageCreate);
+        discordApi.addSlashCommandCreateListener(SlashCommandHandler::handleSlashCommandEvent);
         new BanCommand();
     }
     //TODO - Make the chat commands also viable in non-guild environments?

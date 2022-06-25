@@ -25,7 +25,7 @@ public class BanCommand extends Extension {
             }
     );
 
-    Object ttt = registerGroupedSlashCommand(
+    /*Object ttt = registerGroupedSlashCommand(
             "named",
             "grouped",
             "870341202652827648",
@@ -73,14 +73,17 @@ public class BanCommand extends Extension {
                     BaneCommandArgs.class,
                     (baneCommandArgs, slashCommandContext) -> {}
             )
-    );
+    );*/
 
     Object command = registerBasicSlashCommand(
             "ban",
             "ban",
             "870341202652827648",
             BaneCommandArgs.class,
-            (x,v) -> {}
+            (x,v) -> {
+                v.getSlashCommandInteraction().createImmediateResponder().append("Hello").respond().join();
+                System.out.println("Yay" + x.reasonArg);
+            }
 
     );
 
@@ -96,7 +99,7 @@ public class BanCommand extends Extension {
     public class BaneCommandArgs {
         @SlashCommandArgField(type = SlashCommandOptionType.USER)
         public User targetArg;
-        @SlashCommandArgField(type = SlashCommandOptionType.STRING)
+        @SlashCommandArgField(type = SlashCommandOptionType.STRING, required = false)
         public String reasonArg;
     }
 }

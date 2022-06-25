@@ -72,18 +72,16 @@ public class Extension {
     protected final<T> Object registerBasicSlashCommand(
             String baseName, String description, String guild, Class<T> argClass, BiConsumer<T, SlashCommandCreateEvent> consumer
     ){
-        var commandInstance = new SlashCommandEx(baseName,description,guild);
-        var hashMap = new HashMap<String, Field>();
-        Arrays.stream(argClass.getDeclaredFields())
-                .filter(field -> field.isAnnotationPresent(SlashCommandArgField.class))
-                .forEach(field -> hashMap.put(field.getName(), field));
+        var commandInstance = new SlashCommandEx(baseName,description,guild,this);
+        var fieldlist = Arrays.stream(argClass.getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(SlashCommandArgField.class)).toList();
         commandInstance.baseBranchingCommands.put(
                 "main",
                 new SlashCommandRunner<>(
                         "main",
                         null,
                         argClass,
-                        hashMap,
+                        fieldlist,
                         consumer
                 )
         );
@@ -94,7 +92,7 @@ public class Extension {
     protected final<T> Object registerBasicSlashCommand(
             String baseName, String description, String guild, Consumer<SlashCommandCreateEvent> consumer
     ){
-        var commandInstance = new SlashCommandEx(baseName,description,guild);
+        var commandInstance = new SlashCommandEx(baseName,description,guild,this);
         commandInstance.baseBranchingCommands.put(
                 "main",
                 new SlashCommandRunner<>(
@@ -108,7 +106,7 @@ public class Extension {
     }
     @SafeVarargs
     protected final<T> Object registerBasicSlashCommand(String baseName, String description, String guild, SlashCommandRunner<T>... slashCommandRunners){
-        var baseCommandInstance = new SlashCommandEx(baseName,description,guild);
+        var baseCommandInstance = new SlashCommandEx(baseName,description,guild,this);
         Arrays.stream(slashCommandRunners).forEach(
                 tSlashCommandRunner -> baseCommandInstance.baseBranchingCommands.put(tSlashCommandRunner.name,tSlashCommandRunner)
         );
@@ -117,7 +115,7 @@ public class Extension {
     }
 
     protected final Object registerGroupedSlashCommand(String baseName, String description, String guild, SlashCommandGroup... slashCommandGroups){
-        var baseCommandInstance = new SlashCommandEx(baseName,description,guild);
+        var baseCommandInstance = new SlashCommandEx(baseName,description,guild,this);
         Arrays.stream(slashCommandGroups).forEach(
                 slashCommandGroup -> baseCommandInstance.slashCommandGroups.put(slashCommandGroup.name, slashCommandGroup)
         );

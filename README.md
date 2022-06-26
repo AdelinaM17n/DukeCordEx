@@ -1,9 +1,9 @@
 # DukeCordEx
-DukeCordEx is commandhandler made ontop of ![Javacord](https://github.com/Javacord/Javacord) drawing inspiration from ![KordEx](https://github.com/Kord-Extensions/kord-extensions)
+DukeCordEx is a commandhandler made ontop of ![Javacord](https://github.com/Javacord/Javacord) drawing inspiration from ![KordEx](https://github.com/Kord-Extensions/kord-extensions)
 commandhandler and argument parsing system.   
 ## Aims/Features
-- To simplify the cosmic horror that is javacord slash comamnd registration system while combining slash command registration and responding by taking a response handler Consumer
-- To have an convenient argument parsing system where the responder consumer functions have an instance of a argument template inner class as a parameter (optional).
+- To simplify the cosmic horror that is javacord slash comamnd registration system while combining slash command registration and responding by taking a response handler consumer
+- To have a convenient argument parsing system where the responder consumer functions have an instance of a template argument inner class as a parameter (optional)
 - Simplying and removing most hassles encountered with slash commands/chat commands   
 ## Warning - This is still a hobby project
 I am not in anyway an experienced or very competent developer. This is a hobby project that I mainly develop for my own usage. The code lacks any real documentation, and there are many parts of the codebase that could be greatly improved.

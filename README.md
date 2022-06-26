@@ -6,7 +6,7 @@ commandhandler and argument parsing system.
 - To have an convenient argument parsing system where the responder consumer functions have an instance of a argument template inner class as a parameter (optional).
 - Simplying and removing most hassles encountered with slash commands/chat commands   
 ## Warning - This is still a hobby project
-I am not in anyway an experienced or very competant developer. This is a hobby project I mainly develop for my own usage. The code lacks any real documentation, and there are many parts that could be greatly improved.
+I am not in anyway an experienced or very competent developer. This is a hobby project that I mainly develop for my own usage. The code lacks any real documentation, and there are many parts of the codebase that could be greatly improved.
 I am still new to concepts like generics in Java that I have made use of in this project and I am still learning these concepts and how to best apply them. **This is the nature of this project. If you want that to change, contribute**   
 
 ### Contact me in discord if you have questions

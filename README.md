@@ -1,5 +1,5 @@
 # DukeCordEx
-DukeCordEx is a commandhandler made ontop of ![Javacord](https://github.com/Javacord/Javacord) drawing inspiration from ![KordEx](https://github.com/Kord-Extensions/kord-extensions)
+DukeCordEx is a commandhandler made ontop of [Javacord](https://github.com/Javacord/Javacord) drawing inspiration from [KordEx](https://github.com/Kord-Extensions/kord-extensions)
 commandhandler and argument parsing system.   
 ## Aims/Features
 - To simplify the cosmic horror that is javacord slash comamnd registration system while combining slash command registration and responding by taking a response handler consumer
@@ -13,7 +13,7 @@ I am still new to concepts like generics in Java that I have made use of in this
 
 ### Contact me in discord if you have questions
 - Discord tag - `Maheesha#3825`
-- ![Discord Server](https://discord.gg/VG75NbZBe7)
+- [Discord Server](https://discord.gg/VG75NbZBe7)
 
 # License
 This project is licensed under MPL-2.0 license. 

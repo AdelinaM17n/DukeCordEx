@@ -8,6 +8,8 @@ commandhandler and argument parsing system.
 ## Warning - This is still a hobby project
 I am not in anyway an experienced or very competent developer. This is a hobby project that I mainly develop for my own usage. The code lacks any real documentation, and there are many parts of the codebase that could be greatly improved.
 I am still new to concepts like generics in Java that I have made use of in this project and I am still learning these concepts and how to best apply them. **This is the nature of this project. If you want that to change, contribute**   
+   
+*This repositary is still not fully transformed to a proper library from my test setup. That will be done soon and the test setup will be separated. The test package and the main method initializing the javacord session will be removed soon*
 
 ### Contact me in discord if you have questions
 - Discord tag - `Maheesha#3825`

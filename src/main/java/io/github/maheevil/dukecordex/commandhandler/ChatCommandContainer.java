@@ -4,13 +4,17 @@ import io.github.maheevil.dukecordex.commandhandler.annotations.ArgField;
 import io.github.maheevil.dukecordex.commandhandler.annotations.NoArgs;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.event.message.MessageCreateEvent;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
 public class ChatCommandContainer<T> {
     private final BiConsumer<T, MessageCreateEvent> biConsumer;
     private final Consumer<MessageCreateEvent> consumer;

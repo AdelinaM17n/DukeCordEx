@@ -1,13 +1,16 @@
 package io.github.maheevil.dukecordex.commandhandler.slashcommands;
 
 import org.javacord.api.event.interaction.SlashCommandCreateEvent;
-
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
 public class SlashCommandRunner<T> {
     public final String name;
     public final String description;

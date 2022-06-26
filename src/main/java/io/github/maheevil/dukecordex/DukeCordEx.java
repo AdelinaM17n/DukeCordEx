@@ -3,18 +3,20 @@ package io.github.maheevil.dukecordex;
 import io.github.maheevil.dukecordex.commandhandler.ChatCommandContainer;
 import io.github.maheevil.dukecordex.commandhandler.CommandHandler;
 import io.github.maheevil.dukecordex.commandhandler.Extension;
+import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandEx;
 import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandHandler;
 import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandRegisterer;
-import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandEx;
 import io.github.maheevil.dukecordex.test.BanCommand;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
-
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.function.Predicate;
 
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
 public class DukeCordEx{
     public static HashMap<String, ChatCommandContainer<?>> CommandMap = new HashMap<>();
     public static HashMap<String, SlashCommandEx> SlashCommandMap = new HashMap<>();

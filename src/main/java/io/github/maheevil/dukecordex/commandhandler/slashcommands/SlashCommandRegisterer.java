@@ -18,56 +18,52 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 public class SlashCommandRegisterer {
-    public static void pushAllSlashCommands(List<SlashCommandEx> list, DiscordApi api){
-        list.forEach(
-                entry -> {
-                    var command = SlashCommand.with(entry.baseName,entry.description);
+    public static void pushAllSlashCommands(List<SlashCommandEx> list, DiscordApi api) {
+        for(SlashCommandEx entry : list) {
+            var command = SlashCommand.with(entry.baseName, entry.description);
 
-                    if(entry.slashCommandGroups.isEmpty() && !entry.baseBranchingCommands.isEmpty()){
-                        if(entry.baseBranchingCommands.containsKey("main") && entry.baseBranchingCommands.size() < 2){
-                            AtomicBoolean error = new AtomicBoolean(false);
+            if (entry.slashCommandGroups.isEmpty() && !entry.baseBranchingCommands.isEmpty()) {
+                if (entry.baseBranchingCommands.containsKey("main") && entry.baseBranchingCommands.size() < 2) {
+                    AtomicBoolean error = new AtomicBoolean(false);
 
-                            var runner = entry.baseBranchingCommands.get("main");
-                            if(runner.argsClass != null){
-                                Arrays.stream(runner.argsClass.getDeclaredFields())
-                                        .filter(field -> field.isAnnotationPresent(SlashCommandArgField.class))
-                                        .forEach(field -> error.set(!parseArgs(field, command)));
-                            }
-
-                            if(!error.get()) pushToDiscord(command, api, entry.guildOrNotId);
-                            else System.err.println("Parsing arguments failed");
-
-                        }else if(entry.baseBranchingCommands.size() > 1){
-                            AtomicBoolean error = new AtomicBoolean(false);
-
-                            entry.baseBranchingCommands.values().forEach(
-                                    baseSubCommand -> error.set(!parseBaseSubCommands(baseSubCommand,command))
-                            );
-
-                            if(!error.get()) pushToDiscord(command, api, entry.guildOrNotId);
-                            else System.err.println("Parsing arguments failed");
-
-                        }
-                    } else if(!entry.slashCommandGroups.isEmpty()) {
-                        entry.slashCommandGroups.values().forEach(
-                                slashCommandGroup -> {
-                                    List<SlashCommandOption> groupedSubCommands = getGroupSubComList(slashCommandGroup);
-                                    command.addOption(SlashCommandOption.createWithOptions(
-                                            SlashCommandOptionType.SUB_COMMAND_GROUP,
-                                            slashCommandGroup.name,
-                                            slashCommandGroup.description,
-                                            groupedSubCommands
-                                    ));
-                                }
+                    var runner = entry.baseBranchingCommands.get("main");
+                    if (runner.argsClass != null) {
+                        runner.filteredFieldList.forEach(
+                                field -> error.set(!parseArgs(field, command))
                         );
-                        // TODO - VERY FUCKING URGENT - BETTER ERROR HANDLING
-                        pushToDiscord(
-                                command, api, entry.guildOrNotId
-                        );
-
                     }
+
+                    if (!error.get()) pushToDiscord(command, api, entry.guildOrNotId);
+                    else System.err.println("Parsing arguments failed");
+
+                } else if (entry.baseBranchingCommands.size() > 1) {
+                    AtomicBoolean error = new AtomicBoolean(false);
+
+                    entry.baseBranchingCommands.values().forEach(
+                            baseSubCommand -> error.set(!parseBaseSubCommands(baseSubCommand, command))
+                    );
+
+                    if (!error.get()) pushToDiscord(command, api, entry.guildOrNotId);
+                    else System.err.println("Parsing arguments failed");
+
                 }
-        );
+            } else if (!entry.slashCommandGroups.isEmpty()) {
+                entry.slashCommandGroups.values().forEach(
+                        slashCommandGroup -> command.addOption(
+                                SlashCommandOption.createWithOptions(
+                                        SlashCommandOptionType.SUB_COMMAND_GROUP,
+                                        slashCommandGroup.name,
+                                        slashCommandGroup.description,
+                                        getGroupSubComList(slashCommandGroup)
+                                )
+                        )
+                );
+                // TODO - VERY FUCKING URGENT - BETTER ERROR HANDLING
+                pushToDiscord(
+                        command, api, entry.guildOrNotId
+                );
+            }
+        }
     }
 
     private static void pushToDiscord(SlashCommandBuilder command, DiscordApi api, String guildOrNotId){
@@ -79,61 +75,54 @@ public class SlashCommandRegisterer {
     }
     public static List<SlashCommandOption> getGroupSubComList(SlashCommandGroup group){
         List<SlashCommandOption> list = new ArrayList<>();
-        group.runners.values().forEach(
-                subCommandRunner -> {
-                    List<SlashCommandOption> argsOptionsList = parseArgList(subCommandRunner);
+        for(SlashCommandRunner<?> subCommandRunner : group.runners.values()){
+            List<SlashCommandOption> argsOptionsList = parseArgList(subCommandRunner);
 
-                    if(argsOptionsList == null){
-                        System.err.println("Error");
-                        return;
-                    }
+            if(argsOptionsList == null){
+                System.err.println("Error");
+                continue;
+            }
 
-                    if(!argsOptionsList.isEmpty()){
-                        list.add(
-                                SlashCommandOption.createWithOptions(
-                                        SlashCommandOptionType.SUB_COMMAND,
-                                        subCommandRunner.name,
-                                        subCommandRunner.description,
-                                        argsOptionsList
-                                )
-                        );
-                    }else {
-                        list.add(
-                                SlashCommandOption.create(
-                                        SlashCommandOptionType.SUB_COMMAND,
-                                        subCommandRunner.name,
-                                        subCommandRunner.description
-                                )
-                        );
-                    }
-                }
-        );
+            if(!argsOptionsList.isEmpty()){
+                list.add(
+                        SlashCommandOption.createWithOptions(
+                                SlashCommandOptionType.SUB_COMMAND,
+                                subCommandRunner.name,
+                                subCommandRunner.description,
+                                argsOptionsList
+                        )
+                );
+            }else {
+                list.add(
+                        SlashCommandOption.create(
+                                SlashCommandOptionType.SUB_COMMAND,
+                                subCommandRunner.name,
+                                subCommandRunner.description
+                        )
+                );
+            }
+        }
         return list;
     }
     public static List<SlashCommandOption> parseArgList(SlashCommandRunner<?> subcom){
-        AtomicBoolean encounteredError = new AtomicBoolean(false);
         List<SlashCommandOption> argsOptionsList = new ArrayList<>();
 
-        Arrays.stream(subcom.argsClass.getDeclaredFields()).filter(field -> field.isAnnotationPresent(SlashCommandArgField.class))
-                .forEach(
-                        field -> {
-                            var annotation = field.getAnnotation(SlashCommandArgField.class);
-                            if(annotation.type() == SlashCommandOptionType.SUB_COMMAND){
-                                System.err.println("Invalid Slash Command arg configuration");
-                                encounteredError.set(true);
-                                return;
-                            }
-                            argsOptionsList.add(
-                                    SlashCommandOption.create(
-                                            annotation.type(),
-                                            field.getName(),
-                                            annotation.description(),
-                                            annotation.required()
-                                    )
-                            );
-                        }
-                );
-        return encounteredError.get() ? null : argsOptionsList;
+        for(Field field : subcom.filteredFieldList){
+            var annotation = field.getAnnotation(SlashCommandArgField.class);
+            if(annotation.type() == SlashCommandOptionType.SUB_COMMAND){
+                System.err.println("Invalid Slash Command arg configuration");
+                return null;
+            }
+            argsOptionsList.add(
+                    SlashCommandOption.create(
+                            annotation.type(),
+                            field.getName(),
+                            annotation.description(),
+                            annotation.required()
+                    )
+            );
+        }
+        return argsOptionsList;
     }
     public static boolean parseBaseSubCommands(SlashCommandRunner<?> subcom, SlashCommandBuilder command){
         List<SlashCommandOption> argsOptionsList = parseArgList(subcom);

@@ -117,7 +117,6 @@ public class SlashCommandHandler {
         var innerClass = mainRunner.argsClass;
         var constructor = innerClass.getConstructor(extensionInstance.getClass());
         var argsInstance = constructor.newInstance(extensionInstance);
-        //boolean encounteredError = false;
 
         for(Field field : mainRunner.filteredFieldList){
             var value = baseCommand

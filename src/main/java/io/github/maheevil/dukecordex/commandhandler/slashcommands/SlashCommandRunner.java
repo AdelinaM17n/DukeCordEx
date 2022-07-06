@@ -16,27 +16,30 @@ public class SlashCommandRunner<T> {
     public final String description;
     public final Class<T> argsClass;
     public final List<Field> filteredFieldList;
-    private final Consumer<SlashCommandCreateEvent> consumer;
-    private final BiConsumer<T,SlashCommandCreateEvent> biConsumer;
+    private final Consumer<SlashCommandContext> consumer;
+    private final BiConsumer<T,SlashCommandContext> biConsumer;
+    public final ReplyType replyType;
 
-    public SlashCommandRunner(String name, String description, Class<T> argsClass,List<Field> hashMap, BiConsumer<T,SlashCommandCreateEvent> consumer){
+    public SlashCommandRunner(String name, String description, ReplyType replyType, Class<T> argsClass,List<Field> hashMap, BiConsumer<T,SlashCommandContext> consumer){
         this.name = name;
         this.description = description;
         this.argsClass = argsClass;
         this.biConsumer = consumer;
         this.consumer = null;
         this.filteredFieldList = hashMap;
+        this.replyType = replyType;
     }
-    public SlashCommandRunner(String name, String description, Consumer<SlashCommandCreateEvent> consumer){
+    public SlashCommandRunner(String name, String description, ReplyType replyType, Consumer<SlashCommandContext> consumer){
         this.name = name;
         this.description = description;
         this.consumer = consumer;
         this.biConsumer = null;
         this.argsClass = null;
         this.filteredFieldList = null;
+        this.replyType = replyType;
     }
 
-    public void runConsumer(Object argObject, SlashCommandCreateEvent context){
+    public void runConsumer(Object argObject, SlashCommandContext context){
         if(argObject != null && biConsumer != null && this.argsClass != null)
             this.biConsumer.accept(this.argsClass.cast(argObject),context);
         else if(consumer != null)

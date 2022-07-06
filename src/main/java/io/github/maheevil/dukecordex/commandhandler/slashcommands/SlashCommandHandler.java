@@ -7,6 +7,8 @@ import org.javacord.api.event.interaction.SlashCommandCreateEvent;
 import org.javacord.api.interaction.SlashCommandInteraction;
 import org.javacord.api.interaction.SlashCommandInteractionOption;
 import org.javacord.api.interaction.SlashCommandOptionType;
+import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -86,9 +88,16 @@ public class SlashCommandHandler {
         }
 
         var mainRunner = commandRunnerHashMap.get(commandRunnerName);
+        InteractionOriginalResponseUpdater originalResponseUpdater = null;
+
+        if(mainRunner.replyType != ReplyType.UNDEFINED){
+            originalResponseUpdater = event.getSlashCommandInteraction().respondLater(mainRunner.replyType == ReplyType.EPHERMAL).join();
+        }
+
+        var contextWrapper = new SlashCommandContext(event, originalResponseUpdater);
 
         if(subFirstOption == null){
-            mainRunner.runConsumer(null,event);
+            mainRunner.runConsumer(null,contextWrapper);
         }else {
             try{
                 mainRunner.runConsumer(
@@ -98,7 +107,7 @@ public class SlashCommandHandler {
                                 parentOptionProvider,
                                 commandRunnerName.equals("main")
                         ),
-                        event
+                        contextWrapper
                 );
             } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
                 throw new RuntimeException(e);

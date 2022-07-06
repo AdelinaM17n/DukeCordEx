@@ -13,7 +13,7 @@ import java.util.function.Consumer;
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 public class SlashCommandCreator{
-    public static <T>SlashCommandRunner<T> create(String name, String description, Class<T> argClass, BiConsumer<T, SlashCommandCreateEvent> consumer){
+    public static <T>SlashCommandRunner<T> create(String name, String description, ReplyType replyType, Class<T> argClass, BiConsumer<T, SlashCommandContext> consumer){
         var fieldList = Arrays.stream(argClass.getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(SlashCommandArgField.class))
                 .toList();
@@ -21,16 +21,18 @@ public class SlashCommandCreator{
         return new SlashCommandRunner<>(
                 name,
                 description,
+                replyType,
                 argClass,
                 fieldList,
                 consumer
         );
     }
 
-    public static <T>SlashCommandRunner<T> create(String name, String description, Consumer<SlashCommandCreateEvent> consumer){
+    public static <T>SlashCommandRunner<T> create(String name, String description, ReplyType replyType, Consumer<SlashCommandContext> consumer){
         return new SlashCommandRunner<>(
                 name,
                 description,
+                replyType,
                 consumer
         );
     }

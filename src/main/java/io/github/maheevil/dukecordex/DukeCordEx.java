@@ -6,9 +6,7 @@ import io.github.maheevil.dukecordex.commandhandler.Extension;
 import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandEx;
 import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandHandler;
 import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandRegisterer;
-import io.github.maheevil.dukecordex.test.BanCommand;
 import org.javacord.api.DiscordApi;
-import org.javacord.api.DiscordApiBuilder;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -20,16 +18,6 @@ import java.util.HashMap;
 public class DukeCordEx{
     public static HashMap<String, ChatCommandContainer<?>> CommandMap = new HashMap<>();
     public static HashMap<String, SlashCommandEx> SlashCommandMap = new HashMap<>();
-    public static void main(String[] args){
-        DiscordApi discordApi = new DiscordApiBuilder()
-                .setToken(args[0])
-                .login().join();
-        init(
-                discordApi,
-                new BanCommand()
-        );
-
-    }
 
     public static void init(DiscordApi discordApi, Extension... extensions){
         discordApi.addMessageCreateListener(CommandHandler::onMessageCreate);

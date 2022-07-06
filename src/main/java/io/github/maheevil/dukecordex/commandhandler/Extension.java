@@ -3,9 +3,7 @@ package io.github.maheevil.dukecordex.commandhandler;
 import io.github.maheevil.dukecordex.DukeCordEx;
 import io.github.maheevil.dukecordex.commandhandler.annotations.NoArgs;
 import io.github.maheevil.dukecordex.commandhandler.annotations.SlashCommandArgField;
-import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandEx;
-import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandGroup;
-import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandRunner;
+import io.github.maheevil.dukecordex.commandhandler.slashcommands.*;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.event.interaction.SlashCommandCreateEvent;
 import org.javacord.api.event.message.MessageCreateEvent;
@@ -73,7 +71,7 @@ public class Extension {
     }
 
     protected final<T> Object registerBasicSlashCommand(
-            String baseName, String description, String guild, Class<T> argClass, BiConsumer<T, SlashCommandCreateEvent> consumer
+            String baseName, String description, String guild, ReplyType replyType, Class<T> argClass, BiConsumer<T, SlashCommandContext> consumer
     ){
         var commandInstance = new SlashCommandEx(baseName,description,guild,this);
         var fieldlist = Arrays.stream(argClass.getDeclaredFields())
@@ -83,6 +81,7 @@ public class Extension {
                 new SlashCommandRunner<>(
                         "main",
                         null,
+                        replyType,
                         argClass,
                         fieldlist,
                         consumer
@@ -93,7 +92,7 @@ public class Extension {
     }
 
     protected final<T> Object registerBasicSlashCommand(
-            String baseName, String description, String guild, Consumer<SlashCommandCreateEvent> consumer
+            String baseName, String description, String guild, ReplyType replyType, Consumer<SlashCommandContext> consumer
     ){
         var commandInstance = new SlashCommandEx(baseName,description,guild,this);
         commandInstance.baseBranchingCommands.put(
@@ -101,14 +100,15 @@ public class Extension {
                 new SlashCommandRunner<>(
                         "main",
                         null,
+                        replyType,
                         consumer
                 )
         );
         DukeCordEx.SlashCommandMap.put(baseName,commandInstance);
         return null;
     }
-    @SafeVarargs
-    protected final<T> Object registerBasicSlashCommand(String baseName, String description, String guild, SlashCommandRunner<T>... slashCommandRunners){
+
+    protected final Object registerBasicSlashCommand(String baseName, String description, String guild, SlashCommandRunner<?>... slashCommandRunners){
         var baseCommandInstance = new SlashCommandEx(baseName,description,guild,this);
         Arrays.stream(slashCommandRunners).forEach(
                 tSlashCommandRunner -> baseCommandInstance.baseBranchingCommands.put(tSlashCommandRunner.name,tSlashCommandRunner)

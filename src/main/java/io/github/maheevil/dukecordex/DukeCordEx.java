@@ -18,6 +18,7 @@ import java.util.HashMap;
 public class DukeCordEx{
     public static HashMap<String, ChatCommandContainer<?>> CommandMap = new HashMap<>();
     public static HashMap<String, SlashCommandEx> SlashCommandMap = new HashMap<>();
+    protected static String config = "GLOBAL";
 
     public static void init(DiscordApi discordApi, Extension... extensions){
         discordApi.addMessageCreateListener(CommandHandler::onMessageCreate);
@@ -27,5 +28,16 @@ public class DukeCordEx{
                 extension -> System.out.println(extension.getClass().getSimpleName() + " extension loaded!")
         );
     }
-    //TODO - Make the chat commands also viable in non-guild environments?
+
+    public static void setConfig(String config) {
+        if(config.length() != 18 && !config.equals("GLOBAL")){
+            System.err.println("Invalid entry");
+            return;
+        }
+        DukeCordEx.config = config;
+    }
+
+    public static String getConfig(){
+        return config;
+    }
 }

@@ -20,8 +20,7 @@ import java.util.function.Consumer;
 @SuppressWarnings("SameParameterValue")
 public class Extension {
     protected static String configSetting(){
-        return "GLOBAL";
-        //TODO - AN ACTUAL FUCKING CONFIG SYSTEM
+        return DukeCordEx.getConfig();
     }
     protected static String global(){
         return "GLOBAL";

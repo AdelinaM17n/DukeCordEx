@@ -17,6 +17,8 @@ dependencies {
 }
 
 java {
+    sourceCompatibility(JavaVersion.VERSION_17)
+    targetCompatibility(JavaVersion.VERSION_17)
     withSourcesJar()
     withJavadocJar()
 }
@@ -24,6 +26,7 @@ java {
 publishing {
     publications {
         maven(MavenPublication) {
+            groupId = 'io.github.maheevil.dukecordex'
             from components.java
         }
     }

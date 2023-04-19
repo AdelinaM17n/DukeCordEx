@@ -156,6 +156,8 @@ public class SlashCommandHandler {
     }
     public static Object getOptionValueAsObject(SlashCommandInteractionOption value, SlashCommandOptionType type){
         return switch(type){
+            // TODO - SlashCommandAttachmentHandling
+            // TODO - Wait fuck is this shit seriously throwing a null error if an "OPTIONAL" value is null bruh
             case STRING -> value.getStringValue().orElseThrow();
             case USER -> value.getUserValue().orElse(value.requestUserValue().orElseThrow().join());
             case CHANNEL -> value.getChannelValue().orElseThrow();
@@ -164,7 +166,7 @@ public class SlashCommandHandler {
             case MENTIONABLE -> value.getMentionableValue().orElse(value.requestUserValue().orElseThrow().join());
             case LONG -> value.getLongValue().orElseThrow();
             case ROLE -> value.getRoleValue().orElseThrow();
-            case UNKNOWN, SUB_COMMAND, SUB_COMMAND_GROUP -> null;
+            case UNKNOWN, SUB_COMMAND, SUB_COMMAND_GROUP, ATTACHMENT -> null;
         };
     }
 }

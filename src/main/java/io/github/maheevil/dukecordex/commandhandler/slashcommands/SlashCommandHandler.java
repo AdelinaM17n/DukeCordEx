@@ -100,13 +100,18 @@ public class SlashCommandHandler {
             mainRunner.runConsumer(null,contextWrapper);
         }else {
             try{
+                Object args = parseArgs(
+                        mainRunner,
+                        extension,
+                        parentOptionProvider,
+                        commandRunnerName.equals("main")
+                );
+
+                if(args == null){
+                    return;
+                }
                 mainRunner.runConsumer(
-                        parseArgs(
-                                mainRunner,
-                                extension,
-                                parentOptionProvider,
-                                commandRunnerName.equals("main")
-                        ),
+                        args,
                         contextWrapper
                 );
             } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
@@ -135,18 +140,19 @@ public class SlashCommandHandler {
 
             if(value.isEmpty() && annotation.required()){
                 System.err.println("Command arg signature does not match the local signature");
-                break;
+                return null;
             }else if(value.isEmpty()){
                 field.set(argsInstance,null);
                 continue;
             }
 
             var valueGet = getOptionValueAsObject(value.get(), annotation.type());
+
             if(field.getType().isAssignableFrom(valueGet.getClass())){
                 field.set(argsInstance,valueGet);
             }else if(annotation.required()){
                 System.err.println("One of the Arg field's type cannot assign the argument value");
-                break;
+                return null;
             }else {
                 System.err.println("Skipped assigning an value to an option field - the field type is not assignable to value type.");
                 field.set(argsInstance,null);
@@ -157,7 +163,7 @@ public class SlashCommandHandler {
     public static Object getOptionValueAsObject(SlashCommandInteractionOption value, SlashCommandOptionType type){
         return switch(type){
             // TODO - SlashCommandAttachmentHandling
-            // TODO - Wait fuck is this shit seriously throwing a null error if an "OPTIONAL" value is null bruh
+            // TODO - ADD CONVERSION TYPES THAT ARE NOT LIKE DEFAULT, like colour time etc
             case STRING -> value.getStringValue().orElseThrow();
             case USER -> value.getUserValue().orElse(value.requestUserValue().orElseThrow().join());
             case CHANNEL -> value.getChannelValue().orElseThrow();

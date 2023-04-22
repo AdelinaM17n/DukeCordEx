@@ -3,6 +3,7 @@ package io.github.maheevil.dukecordex;
 import io.github.maheevil.dukecordex.commandhandler.ChatCommandContainer;
 import io.github.maheevil.dukecordex.commandhandler.CommandHandler;
 import io.github.maheevil.dukecordex.commandhandler.Extension;
+import io.github.maheevil.dukecordex.commandhandler.modals.ModalHandler;
 import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandEx;
 import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandHandler;
 import io.github.maheevil.dukecordex.commandhandler.slashcommands.SlashCommandRegisterer;
@@ -22,6 +23,7 @@ public class DukeCordEx{
 
     public static void init(DiscordApi discordApi, Extension... extensions){
         discordApi.addMessageCreateListener(CommandHandler::onMessageCreate);
+        discordApi.addModalSubmitListener(ModalHandler::modalListen);
         SlashCommandRegisterer.pushAllSlashCommands(SlashCommandMap.values().stream().toList(),discordApi);
         discordApi.addSlashCommandCreateListener(SlashCommandHandler::handleSlashCommandEvent);
         Arrays.stream(extensions).toList().forEach(

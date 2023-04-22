@@ -18,12 +18,12 @@ import java.util.*;
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-public class CommandHandler<T> {
+public class CommandHandler {
     public interface ConvertorInterface {
         Object get(String string,DiscordApi discordApi);
     }
 
-    public static <T>void onMessageCreate(MessageCreateEvent event){
+    public static void onMessageCreate(MessageCreateEvent event){
         if(!event.isServerMessage() || !event.getMessageAuthor().isUser() || !event.getMessageContent().startsWith("!"))
             return;
 
@@ -60,6 +60,7 @@ public class CommandHandler<T> {
                 commandObject.runConsumer(null, event);
                 return;
             }
+
             var innerClass = commandObject.argClass;
             var constructor = innerClass.getConstructor(commandObject.extensionInstance.getClass());
             var argsInstance = constructor.newInstance(commandObject.extensionInstance);
@@ -104,6 +105,7 @@ public class CommandHandler<T> {
                 var currentFieldType = orderedList[i].getType();
                 listObjects[i] = converterMap.containsKey(currentFieldType)
                         ? converterMap.get(currentFieldType).get(contents.get(0),apiWrapper) : null;
+
                 if(listObjects[i] != null) orderedList[i] = null;
                 contents.remove(0);
             }
@@ -116,6 +118,7 @@ public class CommandHandler<T> {
 
     public static HashMap<Class<?>, ConvertorInterface> converterMap = new HashMap<>(Map.ofEntries(
             Map.entry(String.class, (string , discordApi) -> string),
+
             Map.entry(User.class, (string , discordApi) -> {
                 if(string.startsWith("<@")){
                     return discordApi.getUserById(string.substring(2, 20)).exceptionally(x -> null).join();
@@ -123,6 +126,7 @@ public class CommandHandler<T> {
                     return discordApi.getUserById(string).exceptionally(x -> null).join();
                 }
             }),
+
             Map.entry(ServerTextChannel.class,(string, discordApi) -> {
                 if(string.startsWith("<#")){
                     return discordApi.getServerTextChannelById(string.substring(2, 20)).orElse(null);
@@ -130,6 +134,7 @@ public class CommandHandler<T> {
                     return discordApi.getServerTextChannelById(string).orElse(null);
                 }
             }),
+
             Map.entry(Channel.class,((string, discordApi) -> {
                 if(string.startsWith("<#")){
                     return discordApi.getChannelById(string.substring(2, 20)).orElse(null);

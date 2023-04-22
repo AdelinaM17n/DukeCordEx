@@ -25,8 +25,8 @@ public class SlashCommandRegisterer {
             if (entry.slashCommandGroups.isEmpty() && !entry.baseBranchingCommands.isEmpty()) {
                 if (entry.baseBranchingCommands.containsKey("main") && entry.baseBranchingCommands.size() < 2) {
                     AtomicBoolean error = new AtomicBoolean(false);
-
                     var runner = entry.baseBranchingCommands.get("main");
+
                     if (runner.argsClass != null) {
                         runner.filteredFieldList.forEach(
                                 field -> error.set(!parseArgs(field, command))
@@ -75,6 +75,7 @@ public class SlashCommandRegisterer {
     }
     public static List<SlashCommandOption> getGroupSubComList(SlashCommandGroup group){
         List<SlashCommandOption> list = new ArrayList<>();
+
         for(SlashCommandRunner<?> subCommandRunner : group.runners.values()){
             List<SlashCommandOption> argsOptionsList = parseArgList(subCommandRunner);
 
@@ -102,6 +103,7 @@ public class SlashCommandRegisterer {
                 );
             }
         }
+
         return list;
     }
     public static List<SlashCommandOption> parseArgList(SlashCommandRunner<?> subcom){
@@ -109,10 +111,12 @@ public class SlashCommandRegisterer {
 
         for(Field field : subcom.filteredFieldList){
             var annotation = field.getAnnotation(SlashCommandArgField.class);
+
             if(annotation.type() == SlashCommandOptionType.SUB_COMMAND){
                 System.err.println("Invalid Slash Command arg configuration");
                 return null;
             }
+
             argsOptionsList.add(
                     SlashCommandOption.create(
                             annotation.type(),
@@ -122,6 +126,7 @@ public class SlashCommandRegisterer {
                     )
             );
         }
+
         return argsOptionsList;
     }
     public static boolean parseBaseSubCommands(SlashCommandRunner<?> subcom, SlashCommandBuilder command){
@@ -149,10 +154,12 @@ public class SlashCommandRegisterer {
 
     public static boolean parseArgs(Field field, SlashCommandBuilder command){
         var annotation = field.getAnnotation(SlashCommandArgField.class);
+
         if(annotation.type() == SlashCommandOptionType.SUB_COMMAND){
             System.err.println("Invalid Slash Command arg configuration");
             return false;
         }
+
         command.addOption(
                 SlashCommandOption.create(
                         annotation.type(),
@@ -161,6 +168,7 @@ public class SlashCommandRegisterer {
                         annotation.required()
                 )
         );
+
         return true;
     }
 }

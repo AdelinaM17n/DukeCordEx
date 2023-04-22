@@ -1,6 +1,5 @@
 package io.github.maheevil.dukecordex.commandhandler.slashcommands;
 
-import org.javacord.api.event.interaction.SlashCommandCreateEvent;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -20,16 +19,29 @@ public class SlashCommandRunner<T> {
     private final BiConsumer<T,SlashCommandContext> biConsumer;
     public final ReplyType replyType;
 
-    public SlashCommandRunner(String name, String description, ReplyType replyType, Class<T> argsClass,List<Field> hashMap, BiConsumer<T,SlashCommandContext> consumer){
+    public SlashCommandRunner(
+            String name,
+            String description,
+            ReplyType replyType,
+            Class<T> argsClass,
+            List<Field> fieldList,
+            BiConsumer<T,SlashCommandContext> consumer
+    ){
         this.name = name;
         this.description = description;
         this.argsClass = argsClass;
         this.biConsumer = consumer;
         this.consumer = null;
-        this.filteredFieldList = hashMap;
+        this.filteredFieldList = fieldList;
         this.replyType = replyType;
     }
-    public SlashCommandRunner(String name, String description, ReplyType replyType, Consumer<SlashCommandContext> consumer){
+
+    public SlashCommandRunner(
+            String name,
+            String description,
+            ReplyType replyType,
+            Consumer<SlashCommandContext> consumer
+    ){
         this.name = name;
         this.description = description;
         this.consumer = consumer;

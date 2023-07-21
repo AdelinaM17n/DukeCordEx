@@ -13,13 +13,14 @@ public class ModalHandler {
     private static final HashMap<String, ModalRunner<?>> modalActionMap = new HashMap<>();
     private static final HashMap<String, Consumer<ModalSubmitEvent>> nonClassActionMap = new HashMap<>();
 
-    public static void modalListen(ModalSubmitEvent modalSubmitEvent) {
+    public static void modalListener(ModalSubmitEvent modalSubmitEvent) {
         ModalInteraction modalInteraction = modalSubmitEvent.getModalInteraction();
-        ModalRunner<?> modalRunner = modalActionMap.getOrDefault(modalInteraction.getCustomId(), null);
-        Consumer<ModalSubmitEvent> nonClassRunner = nonClassActionMap.getOrDefault(modalInteraction.getCustomId(), null);
+        String customId = modalInteraction.getCustomId();
+        ModalRunner<?> modalRunner = modalActionMap.getOrDefault(customId, null);
+        Consumer<ModalSubmitEvent> nonClassRunner = nonClassActionMap.getOrDefault(customId, null);
 
         if (modalRunner == null && nonClassRunner == null) {
-            System.out.println("Unknown Modal Received : " + modalInteraction.getCustomId());
+            System.out.println("Unknown Modal Received : " + customId);
             return;
         }
 
@@ -39,8 +40,11 @@ public class ModalHandler {
                 throw new RuntimeException(e);
             }
 
+            modalActionMap.remove(customId);
+
         }else {
             nonClassRunner.accept(modalSubmitEvent);
+            nonClassActionMap.remove(customId);
         }
     }
 
@@ -73,7 +77,7 @@ public class ModalHandler {
 
             // this useless code is kept for the future when I add custom conversion types (like time/colour etc)
             if(field.getType().isAssignableFrom(valueGet.getClass())){
-                field.set(argsInstance,valueGet);;
+                field.set(argsInstance,valueGet);
             }else if(annotation.required()){
                 System.err.println("One of the Arg field's type cannot assign the argument value");
                 return null;

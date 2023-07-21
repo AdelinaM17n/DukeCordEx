@@ -107,7 +107,7 @@ public class CommandHandler {
                         ? converterMap.get(currentFieldType).get(contents.get(0),apiWrapper) : null;
 
                 if(listObjects[i] != null) orderedList[i] = null;
-                contents.remove(0);
+                contents.remove(0); // TODO - make sure that it won't remove this if optional
             }
         }
 

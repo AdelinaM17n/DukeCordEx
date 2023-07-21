@@ -23,7 +23,7 @@ public class DukeCordEx{
 
     public static void init(DiscordApi discordApi, Extension... extensions){
         discordApi.addMessageCreateListener(CommandHandler::onMessageCreate);
-        discordApi.addModalSubmitListener(ModalHandler::modalListen);
+        discordApi.addModalSubmitListener(ModalHandler::modalListener);
         SlashCommandRegisterer.pushAllSlashCommands(SlashCommandMap.values().stream().toList(),discordApi);
         discordApi.addSlashCommandCreateListener(SlashCommandHandler::handleSlashCommandEvent);
         Arrays.stream(extensions).toList().forEach(

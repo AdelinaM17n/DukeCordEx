@@ -11,6 +11,7 @@ import java.util.function.Consumer;
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+@SuppressWarnings("unused")
 public class SlashCommandCreator {
     public static <T> SlashCommandRunner<T> create(String name, String description, ReplyType replyType, Class<T> argClass, BiConsumer<T, SlashCommandContext> consumer) {
         var fieldList = Arrays.stream(argClass.getDeclaredFields())

@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class SlashCommandRegisterer {
     public static void pushAllSlashCommands(List<SlashCommandEx> list, DiscordApi api) {
-        for(SlashCommandEx entry : list) {
+        for (SlashCommandEx entry : list) {
             var command = SlashCommand.with(entry.baseName, entry.description);
 
             if (entry.slashCommandGroups.isEmpty() && !entry.baseBranchingCommands.isEmpty()) {
@@ -66,25 +66,26 @@ public class SlashCommandRegisterer {
         }
     }
 
-    private static void pushToDiscord(SlashCommandBuilder command, DiscordApi api, String guildOrNotId){
-        if(guildOrNotId.equals("GLOBAL")) {
+    private static void pushToDiscord(SlashCommandBuilder command, DiscordApi api, String guildOrNotId) {
+        if (guildOrNotId.equals("GLOBAL")) {
             command.createGlobal(api);
-        }else {
+        } else {
             command.createForServer(api.getServerById(guildOrNotId).orElseThrow());
         }
     }
-    public static List<SlashCommandOption> getGroupSubComList(SlashCommandGroup group){
+
+    public static List<SlashCommandOption> getGroupSubComList(SlashCommandGroup group) {
         List<SlashCommandOption> list = new ArrayList<>();
 
-        for(SlashCommandRunner<?> subCommandRunner : group.runners.values()){
+        for (SlashCommandRunner<?> subCommandRunner : group.runners.values()) {
             List<SlashCommandOption> argsOptionsList = parseArgList(subCommandRunner);
 
-            if(argsOptionsList == null){
+            if (argsOptionsList == null) {
                 System.err.println("Error");
                 continue;
             }
 
-            if(!argsOptionsList.isEmpty()){
+            if (!argsOptionsList.isEmpty()) {
                 list.add(
                         SlashCommandOption.createWithOptions(
                                 SlashCommandOptionType.SUB_COMMAND,
@@ -93,7 +94,7 @@ public class SlashCommandRegisterer {
                                 argsOptionsList
                         )
                 );
-            }else {
+            } else {
                 list.add(
                         SlashCommandOption.create(
                                 SlashCommandOptionType.SUB_COMMAND,
@@ -106,13 +107,14 @@ public class SlashCommandRegisterer {
 
         return list;
     }
-    public static List<SlashCommandOption> parseArgList(SlashCommandRunner<?> subcom){
+
+    public static List<SlashCommandOption> parseArgList(SlashCommandRunner<?> subcom) {
         List<SlashCommandOption> argsOptionsList = new ArrayList<>();
 
-        for(Field field : subcom.filteredFieldList){
+        for (Field field : subcom.filteredFieldList) {
             var annotation = field.getAnnotation(SlashCommandArgField.class);
 
-            if(annotation.type() == SlashCommandOptionType.SUB_COMMAND){
+            if (annotation.type() == SlashCommandOptionType.SUB_COMMAND) {
                 System.err.println("Invalid Slash Command arg configuration");
                 return null;
             }
@@ -129,19 +131,20 @@ public class SlashCommandRegisterer {
 
         return argsOptionsList;
     }
-    public static boolean parseBaseSubCommands(SlashCommandRunner<?> subcom, SlashCommandBuilder command){
+
+    public static boolean parseBaseSubCommands(SlashCommandRunner<?> subcom, SlashCommandBuilder command) {
         List<SlashCommandOption> argsOptionsList = parseArgList(subcom);
 
-        if(argsOptionsList == null) return false;
+        if (argsOptionsList == null) return false;
 
-        if(!argsOptionsList.isEmpty()){
+        if (!argsOptionsList.isEmpty()) {
             command.addOption(SlashCommandOption.createWithOptions(
                     SlashCommandOptionType.SUB_COMMAND,
                     subcom.name,
                     subcom.description,
                     argsOptionsList
             ));
-        }else {
+        } else {
             command.addOption(SlashCommandOption.createWithOptions(
                     SlashCommandOptionType.SUB_COMMAND,
                     subcom.name,
@@ -149,13 +152,13 @@ public class SlashCommandRegisterer {
             ));
         }
 
-       return true;
+        return true;
     }
 
-    public static boolean parseArgs(Field field, SlashCommandBuilder command){
+    public static boolean parseArgs(Field field, SlashCommandBuilder command) {
         var annotation = field.getAnnotation(SlashCommandArgField.class);
 
-        if(annotation.type() == SlashCommandOptionType.SUB_COMMAND){
+        if (annotation.type() == SlashCommandOptionType.SUB_COMMAND) {
             System.err.println("Invalid Slash Command arg configuration");
             return false;
         }

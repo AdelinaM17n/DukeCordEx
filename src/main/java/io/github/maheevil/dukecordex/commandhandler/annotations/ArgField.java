@@ -14,6 +14,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface ArgField {
     ArgParseType type() default ArgParseType.NORMAL;
+
     int index();
+
     boolean optional() default false;
 }

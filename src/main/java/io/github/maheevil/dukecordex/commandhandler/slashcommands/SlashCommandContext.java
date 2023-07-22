@@ -7,12 +7,12 @@ public class SlashCommandContext {
     public final SlashCommandCreateEvent event;
     private final InteractionOriginalResponseUpdater originalResponseUpdater;
 
-    public SlashCommandContext(SlashCommandCreateEvent event, InteractionOriginalResponseUpdater originalResponseUpdater){
+    public SlashCommandContext(SlashCommandCreateEvent event, InteractionOriginalResponseUpdater originalResponseUpdater) {
         this.event = event;
         this.originalResponseUpdater = originalResponseUpdater;
     }
 
-    public void respond(String string){
+    public void respond(String string) {
         this.originalResponseUpdater.setContent(string).update();
     }
 }

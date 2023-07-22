@@ -21,7 +21,7 @@ import java.util.HashMap;
 public class SlashCommandHandler {
     public static void handleSlashCommandEvent(SlashCommandCreateEvent event) {
         var slashCommandInteraction = event.getSlashCommandInteraction();
-        if(!DukeCordEx.SlashCommandMap.containsKey(slashCommandInteraction.getCommandName())){
+        if (!DukeCordEx.SlashCommandMap.containsKey(slashCommandInteraction.getCommandName())) {
             System.err.println("Unknown command");
             return;
         }
@@ -29,7 +29,7 @@ public class SlashCommandHandler {
         var commandInstance = DukeCordEx.SlashCommandMap.get(slashCommandInteraction.getCommandName());
         var baseSubfirstOption = slashCommandInteraction.getOptionByIndex(0).orElse(null);
 
-        if(baseSubfirstOption == null || !baseSubfirstOption.isSubcommandOrGroup()){
+        if (baseSubfirstOption == null || !baseSubfirstOption.isSubcommandOrGroup()) {
             runCommandRunner(
                     "main",
                     commandInstance.baseBranchingCommands,
@@ -38,9 +38,9 @@ public class SlashCommandHandler {
                     event,
                     commandInstance.extensionInstance
             );
-        }else{
+        } else {
             var subFirstOption = baseSubfirstOption.getOptionByIndex(0).orElse(null);
-            if(subFirstOption == null || !subFirstOption.isSubcommandOrGroup()){
+            if (subFirstOption == null || !subFirstOption.isSubcommandOrGroup()) {
                 runCommandRunner(
                         baseSubfirstOption.getName(),
                         commandInstance.baseBranchingCommands,
@@ -49,15 +49,15 @@ public class SlashCommandHandler {
                         event,
                         commandInstance.extensionInstance
                 );
-            }else {
+            } else {
                 var subSubFirstOption = subFirstOption.getOptionByIndex(0).orElse(null);
 
-                if(!commandInstance.slashCommandGroups.containsKey(baseSubfirstOption.getName())){
+                if (!commandInstance.slashCommandGroups.containsKey(baseSubfirstOption.getName())) {
                     System.err.println("Invalide Command registration");
                     return;
                 }
 
-                if(subSubFirstOption == null || !subSubFirstOption.isSubcommandOrGroup()){
+                if (subSubFirstOption == null || !subSubFirstOption.isSubcommandOrGroup()) {
                     runCommandRunner(
                             subFirstOption.getName(),
                             commandInstance.slashCommandGroups.get(baseSubfirstOption.getName()).runners,
@@ -66,7 +66,7 @@ public class SlashCommandHandler {
                             event,
                             commandInstance.extensionInstance
                     );
-                }else {
+                } else {
                     System.err.println("How did we get here? - received an invalid slash command run object");
                 }
             }
@@ -76,13 +76,13 @@ public class SlashCommandHandler {
 
     private static void runCommandRunner(
             String commandRunnerName,
-            HashMap<String,SlashCommandRunner<?>> commandRunnerHashMap,
+            HashMap<String, SlashCommandRunner<?>> commandRunnerHashMap,
             SlashCommandInteractionOption subFirstOption,
             Object parentOptionProvider,
             SlashCommandCreateEvent event,
             Extension extension
-    ){
-        if(!commandRunnerHashMap.containsKey(commandRunnerName)){
+    ) {
+        if (!commandRunnerHashMap.containsKey(commandRunnerName)) {
             System.err.println("Invalid command registration");
             return;
         }
@@ -90,16 +90,16 @@ public class SlashCommandHandler {
         var mainRunner = commandRunnerHashMap.get(commandRunnerName);
         InteractionOriginalResponseUpdater originalResponseUpdater = null;
 
-        if(mainRunner.replyType != ReplyType.UNDEFINED){
+        if (mainRunner.replyType != ReplyType.UNDEFINED) {
             originalResponseUpdater = event.getSlashCommandInteraction().respondLater(mainRunner.replyType == ReplyType.EPHERMAL).join();
         }
 
         var contextWrapper = new SlashCommandContext(event, originalResponseUpdater);
 
-        if(subFirstOption == null){
-            mainRunner.runConsumer(null,contextWrapper);
-        }else {
-            try{
+        if (subFirstOption == null) {
+            mainRunner.runConsumer(null, contextWrapper);
+        } else {
+            try {
                 Object args = parseArgs(
                         mainRunner,
                         extension,
@@ -107,14 +107,15 @@ public class SlashCommandHandler {
                         commandRunnerName.equals("main")
                 );
 
-                if(args == null){
+                if (args == null) {
                     return;
                 }
                 mainRunner.runConsumer(
                         args,
                         contextWrapper
                 );
-            } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
+                     IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -132,36 +133,37 @@ public class SlashCommandHandler {
         var constructor = innerClass.getConstructor(extensionInstance.getClass());
         var argsInstance = constructor.newInstance(extensionInstance);
 
-        for(Field field : mainRunner.filteredFieldList){
+        for (Field field : mainRunner.filteredFieldList) {
             var value = baseCommand
                     ? ((SlashCommandInteraction) optionProvider).getOptionByName(field.getName())
                     : ((SlashCommandInteractionOption) optionProvider).getOptionByName(field.getName());
             var annotation = field.getAnnotation(SlashCommandArgField.class);
 
-            if(value.isEmpty() && annotation.required()){
+            if (value.isEmpty() && annotation.required()) {
                 System.err.println("Command arg signature does not match the local signature");
                 return null;
-            }else if(value.isEmpty()){
-                field.set(argsInstance,null);
+            } else if (value.isEmpty()) {
+                field.set(argsInstance, null);
                 continue;
             }
 
             var valueGet = getOptionValueAsObject(value.get(), annotation.type());
 
-            if(field.getType().isAssignableFrom(valueGet.getClass())){
-                field.set(argsInstance,valueGet);
-            }else if(annotation.required()){
+            if (field.getType().isAssignableFrom(valueGet.getClass())) {
+                field.set(argsInstance, valueGet);
+            } else if (annotation.required()) {
                 System.err.println("One of the Arg field's type cannot assign the argument value");
                 return null;
-            }else {
+            } else {
                 System.err.println("Skipped assigning an value to an option field - the field type is not assignable to value type.");
-                field.set(argsInstance,null);
+                field.set(argsInstance, null);
             }
         }
         return argsInstance;
     }
-    public static Object getOptionValueAsObject(SlashCommandInteractionOption value, SlashCommandOptionType type){
-        return switch(type){
+
+    public static Object getOptionValueAsObject(SlashCommandInteractionOption value, SlashCommandOptionType type) {
+        return switch (type) {
             // TODO - SlashCommandAttachmentHandling
             // TODO - ADD CONVERSION TYPES THAT ARE NOT LIKE DEFAULT, like colour time etc
             case STRING -> value.getStringValue().orElseThrow();

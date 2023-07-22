@@ -1,6 +1,7 @@
 package io.github.maheevil.dukecordex.commandhandler.slashcommands;
 
 import io.github.maheevil.dukecordex.commandhandler.Extension;
+
 import java.util.HashMap;
 
 /*
@@ -13,10 +14,10 @@ public class SlashCommandEx {
     public final String description;
     public final String guildOrNotId;
     public final Extension extensionInstance;
-    public final HashMap<String,SlashCommandGroup> slashCommandGroups = new HashMap<>();
-    public final HashMap<String,SlashCommandRunner<?>> baseBranchingCommands = new HashMap<>();
+    public final HashMap<String, SlashCommandGroup> slashCommandGroups = new HashMap<>();
+    public final HashMap<String, SlashCommandRunner<?>> baseBranchingCommands = new HashMap<>();
 
-    public SlashCommandEx(String baseName, String description,String guildOrNotId, Extension extensionInstance){
+    public SlashCommandEx(String baseName, String description, String guildOrNotId, Extension extensionInstance) {
         this.baseName = baseName;
         this.description = description;
         this.guildOrNotId = guildOrNotId;

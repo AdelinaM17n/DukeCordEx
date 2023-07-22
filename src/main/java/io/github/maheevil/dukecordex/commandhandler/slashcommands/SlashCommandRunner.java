@@ -15,9 +15,9 @@ public class SlashCommandRunner<T> {
     public final String description;
     public final Class<T> argsClass;
     public final List<Field> filteredFieldList;
-    private final Consumer<SlashCommandContext> consumer;
-    private final BiConsumer<T,SlashCommandContext> biConsumer;
     public final ReplyType replyType;
+    private final Consumer<SlashCommandContext> consumer;
+    private final BiConsumer<T, SlashCommandContext> biConsumer;
 
     public SlashCommandRunner(
             String name,
@@ -25,8 +25,8 @@ public class SlashCommandRunner<T> {
             ReplyType replyType,
             Class<T> argsClass,
             List<Field> fieldList,
-            BiConsumer<T,SlashCommandContext> consumer
-    ){
+            BiConsumer<T, SlashCommandContext> consumer
+    ) {
         this.name = name;
         this.description = description;
         this.argsClass = argsClass;
@@ -41,7 +41,7 @@ public class SlashCommandRunner<T> {
             String description,
             ReplyType replyType,
             Consumer<SlashCommandContext> consumer
-    ){
+    ) {
         this.name = name;
         this.description = description;
         this.consumer = consumer;
@@ -51,10 +51,10 @@ public class SlashCommandRunner<T> {
         this.replyType = replyType;
     }
 
-    public void runConsumer(Object argObject, SlashCommandContext context){
-        if(argObject != null && biConsumer != null && this.argsClass != null)
-            this.biConsumer.accept(this.argsClass.cast(argObject),context);
-        else if(consumer != null)
+    public void runConsumer(Object argObject, SlashCommandContext context) {
+        if (argObject != null && biConsumer != null && this.argsClass != null)
+            this.biConsumer.accept(this.argsClass.cast(argObject), context);
+        else if (consumer != null)
             this.consumer.accept(context);
         else
             System.err.println("Error - the specified consumer is null");

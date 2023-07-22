@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 public class Modal {
     public static void create(
@@ -22,14 +21,14 @@ public class Modal {
             List<HighLevelComponent> highLevelComponentList,
             InteractionBase interactionBase,
             Consumer<ModalSubmitEvent> actionRunner
-    ){
-        if(!ModalHandler.isUniqueID(customId)){
+    ) {
+        if (!ModalHandler.isUniqueID(customId)) {
             System.out.println("There is another queried modal with the same ID : " + customId);
             return;
         }
 
         ModalHandler.addModalActionRunner(customId, actionRunner);
-        interactionBase.respondWithModal(customId,title, highLevelComponentList);
+        interactionBase.respondWithModal(customId, title, highLevelComponentList);
     }
 
     public static <T> void create(
@@ -38,8 +37,8 @@ public class Modal {
             Class<T> tClass,
             InteractionBase interactionBase,
             BiConsumer<ModalSubmitEvent, T> actionRunner
-    ){
-        if(!ModalHandler.isUniqueID(customId)){
+    ) {
+        if (!ModalHandler.isUniqueID(customId)) {
             System.out.println("There is another queried modal with the same ID : " + customId);
             return;
         }
@@ -50,13 +49,13 @@ public class Modal {
         ModalRunner<T> tModalRunner = new ModalRunner<>(tClass, fieldList, actionRunner);
         ModalHandler.addModalActionRunner(customId, tModalRunner);
 
-        interactionBase.respondWithModal(customId,title,highLevelComponentList);
+        interactionBase.respondWithModal(customId, title, highLevelComponentList);
     }
 
-    public static List<HighLevelComponent> parseComponents(List<Field> fields){
+    public static List<HighLevelComponent> parseComponents(List<Field> fields) {
         List<HighLevelComponent> highLevelComponentList = new ArrayList<>();
 
-        for(Field field : fields){
+        for (Field field : fields) {
             ModalArgField annotation = field.getAnnotation(ModalArgField.class);
 
             highLevelComponentList.add(

@@ -16,7 +16,7 @@ import java.util.function.Consumer;
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-@SuppressWarnings({"SameParameterValue", "unused"})
+@SuppressWarnings("SameParameterValue")
 public class Extension {
     protected static String configSetting() {
         return DukeCordEx.getConfig();

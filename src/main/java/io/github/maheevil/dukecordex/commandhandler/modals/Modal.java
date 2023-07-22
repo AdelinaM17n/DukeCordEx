@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-@SuppressWarnings("unused")
 public class Modal {
     public static void create(
             String customId,

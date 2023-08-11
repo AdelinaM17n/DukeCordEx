@@ -12,7 +12,7 @@ I am still new to concepts like generics in Java that I have made use of in this
 *This repositary is still not fully transformed to a proper library from my test setup. That will be done soon and the test setup will be separated. The test package and the main method initializing the javacord session will be removed soon*
 
 ### Contact me in discord if you have questions
-- Discord tag - `Maheesha#3825`
+- Discord tag - `mahee__`
 - [Discord Server](https://discord.gg/VG75NbZBe7)
 
 # License
